@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/background_favicon32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/background_favicon16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":300,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":null,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":"Trebuchet","preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="从零开始实现C++TinyWebServer-②​    关于Buffer实质是参考了陈硕大佬的muduo库中的buffer应用，下面的内容大部分取自陈硕大佬的原话，详见：https:&#x2F;&#x2F;github.com&#x2F;chenshuo&#x2F;muduo 和 https:&#x2F;&#x2F;blog.csdn.net&#x2F;Solstice&#x2F;article&#x2F;details&#x2F;6329080  ​    非阻塞I&#x2F;O的思想是避免">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TinyWebServer-2">
+<meta property="og:url" content="http://example.com/2023/07/03/TinyWebServer-2/index.html">
+<meta property="og:site_name" content="ZzBoAYU HOME">
+<meta property="og:description" content="从零开始实现C++TinyWebServer-②​    关于Buffer实质是参考了陈硕大佬的muduo库中的buffer应用，下面的内容大部分取自陈硕大佬的原话，详见：https:&#x2F;&#x2F;github.com&#x2F;chenshuo&#x2F;muduo 和 https:&#x2F;&#x2F;blog.csdn.net&#x2F;Solstice&#x2F;article&#x2F;details&#x2F;6329080  ​    非阻塞I&#x2F;O的思想是避免">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2023/07/03/TinyWebServer-2/Buffer%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84.gif">
+<meta property="article:published_time" content="2023-07-03T06:26:47.000Z">
+<meta property="article:modified_time" content="2023-07-03T10:33:56.800Z">
+<meta property="article:author" content="ZzBoAYU">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2023/07/03/TinyWebServer-2/Buffer%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84.gif">
+
+<link rel="canonical" href="http://example.com/2023/07/03/TinyWebServer-2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>TinyWebServer-2 | ZzBoAYU HOME</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"><a target="_blank" rel="noopener" href="https://github.com/ZzBobo0915" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#fff; color:#151513; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">ZzBoAYU HOME</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">AYU是我最爱的姑娘</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/03/TinyWebServer-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/touxiang.gif">
+      <meta itemprop="name" content="ZzBoAYU">
+      <meta itemprop="description" content="-珍惜眼前人-">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZzBoAYU HOME">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          TinyWebServer-2
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-07-03 14:26:47 / 修改时间：18:33:56" itemprop="dateCreated datePublished" datetime="2023-07-03T14:26:47+08:00">2023-07-03</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/WebServer/" itemprop="url" rel="index"><span itemprop="name">WebServer</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="从零开始实现C-TinyWebServer-②"><a href="#从零开始实现C-TinyWebServer-②" class="headerlink" title="从零开始实现C++TinyWebServer-②"></a>从零开始实现C++TinyWebServer-②</h1><p>​    关于Buffer实质是参考了陈硕大佬的muduo库中的buffer应用，下面的内容大部分取自陈硕大佬的原话，详见：<a target="_blank" rel="noopener" href="https://github.com/chenshuo/muduo">https://github.com/chenshuo/muduo</a> 和 <a target="_blank" rel="noopener" href="https://blog.csdn.net/Solstice/article/details/6329080">https://blog.csdn.net/Solstice/article/details/6329080</a></p>
+<hr>
+<p>​    非阻塞I&#x2F;O的思想是避免阻塞在read()或write()等需要I&#x2F;O系统调用上，让一个线程等服务于多个socket连接，I&#x2F;O线程只能阻塞在I&#x2F;O多路复用函数上，如select&#x2F;poll&#x2F;epoll上，这样一来应用层的缓冲是必须有的。每个TCP scoket都要有有状态的inout buffr与output buffer。</p>
+<p>​    <strong>要想程序在write操作上不阻塞，网络库必须要给每个TCP连接配置output buffer:</strong></p>
+<ul>
+<li>例如程序发送了100kb的数据，然而操作系统只能接受80kb，你肯定不想原地等待，因为不知道要等多久，程序应该尽快的交出控制权，返回event loop；对于应用程序而言，它并不关心数据是怎么发送的，它只管生成数据，这些应该有网络库管理，程序只管调用send()就行，网络库接管这剩下的20kb数据；这种情况下读缓冲区的必须的，把这20kb的数据保存到缓冲区的output buffer中，然后注册epollout事件，一旦socket可写就发送数据，如果还有剩余就重复以上操作，直到无数据可发送；</li>
+<li>如果20kb没有发完又来了30kb，那么这30kb应该append到20kb后面，等待可写时一并写入；</li>
+<li>如果缓冲区还有数据，但是程序想关闭连接，那么这时候网络库不能立刻关闭连接，而是要等到数据发送完毕再关闭，也就是后面会提到的<strong>“优雅关闭”</strong>。</li>
+</ul>
+<p>​    <strong>要想程序在read操作上不阻塞，网络库必须要给每个TCP连接配置input buffer:</strong></p>
+<ul>
+<li>TCP是一个无边界的字节流协议，接收方会经常碰到“收到的数据构不成一条完整的消息”、“一次收到两条消息的数据”等情况；当网络库处理socket可读事件时，必须一次性把socket里的数据读完（从操作系统buffer搬到应用层buffer），否则会反复出发POLLIN事件，那么对于“数据不完整”的情况，收到的数据通常是先放在input buffer中，等构成一条完整的消息时再通知程序的业务逻辑；这种情况下写缓冲区的必须的。</li>
+</ul>
+<h2 id="Buffer类"><a href="#Buffer类" class="headerlink" title="Buffer类"></a>Buffer类</h2><p>​    缓冲区类，设计源自moduo库：</p>
+<ul>
+<li>对外的接口为 <code>ReadFd(int fd, int* Errno)</code> 与 <code>WriteFd(int fd, int* Errno)</code></li>
+<li>往buffer写时是writeIndex移动</li>
+<li>从buffer读时是readIndex移动</li>
+<li>外部写入fd时是将buffer中的readable写入fd</li>
+<li>外部读取fd时是读取到writeable的位置</li>
+<li>有一个prependabel空间，让程序能以很低的代价在数据<strong>前面</strong>添加几个字节</li>
+<li><code>prependable = readIndex</code></li>
+<li><code>readable = writeIndex-readIndex</code></li>
+<li><code>writeable = size()-writeIndex</code></li>
+</ul>
+<img src="/2023/07/03/TinyWebServer-2/Buffer%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84.gif" class="" title="Buffer的数据结构">
+
+<p>​    <strong>ps:补充一下基础， <code>size_t</code>是无符号整型，在32位系统上长度为4个字节，64位长度位8个字节；<code>ssize_t</code>为有符号整型，32位系统上等同于int，64位等同于long int；一般采用ssize_t来表示可以被执行读写操作的数据块的大小。</strong></p>
+<h2 id="实现与代码"><a href="#实现与代码" class="headerlink" title="实现与代码"></a>实现与代码</h2><p>​    <strong>WebServer中，客户端连接发来的Http请求(放到conn的读缓冲区)以及回复给客户端的响应报文(放在conn的写缓冲区)，都需要通过缓冲区来进行；以vector容器作为底层实体，封装一些方法用来实现自己的buffer缓冲区，满足读写需要。</strong></p>
+<h3 id="ivoec结构体的使用"><a href="#ivoec结构体的使用" class="headerlink" title="ivoec结构体的使用"></a>ivoec结构体的使用</h3><p> iovec定义了一个向量元素，这个结构体用于一个多元素的数组，每一个元素的 <code>iov_base</code> 指向一个缓冲区，这个缓冲区存放的是网络接收的数据(read)或网络将要发送的数据(write)。<code>iov_len</code> 存放接收数据的最大长度或者写入数据的实际长度：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">iovec</span>&#123;</span></span><br><span class="line">    <span class="type">void</span> iov_base;</span><br><span class="line">    <span class="type">size_t</span> iov_len;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>​    在linux中，使用iovec的结构体变量作为参数的函数很多，比如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/uio.h&gt;</span></span></span><br><span class="line"><span class="comment">// iovcnt表示iovec数组的大小</span></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">readv</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="keyword">struct</span> iovec* iov, <span class="type">int</span> iovcnt)</span>;</span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">writev</span><span class="params">(<span class="type">int</span>, fd, <span class="type">const</span> <span class="keyword">struct</span> iovec* iov, <span class="type">int</span> iovcnt)</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="具体代码"><a href="#具体代码" class="headerlink" title="具体代码"></a>具体代码</h3><p><strong>buffer.h</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * @Author  : Zhu Zhibo</span></span><br><span class="line"><span class="comment"> * @Data    : 2023/07/03</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> BUFFER_NEW_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BUFFER_NEW_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstring&gt;</span>  <span class="comment">// perror</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span> <span class="comment">// write</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/uio.h&gt;</span> <span class="comment">// readv</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;atomic&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;assert.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Buffer</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">Buffer</span>(<span class="type">int</span> initBufferSize = <span class="number">1024</span>);</span><br><span class="line">	~<span class="built_in">Buffer</span>() = <span class="keyword">default</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 返回三段区域可用的大小</span></span><br><span class="line">	<span class="function"><span class="type">size_t</span> <span class="title">WritableBytes</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line">	<span class="function"><span class="type">size_t</span> <span class="title">ReadableBytes</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line">	<span class="function"><span class="type">size_t</span> <span class="title">PrependableBytes</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">Peek</span><span class="params">()</span> <span class="type">const</span></span>;  <span class="comment">// 获取读指针</span></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">EnsureWritable</span><span class="params">(<span class="type">size_t</span> len)</span></span>;  <span class="comment">// 确保可写长度</span></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">HasWritten</span><span class="params">(<span class="type">size_t</span> len)</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 读取len数据</span></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">Retrieve</span><span class="params">(<span class="type">size_t</span> len)</span></span>;</span><br><span class="line">	<span class="comment">// 读取到end位置</span></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">RetrieveUntil</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* end)</span></span>;</span><br><span class="line">	<span class="comment">// 取出所有数据</span></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">RetrieveAll</span><span class="params">()</span></span>; </span><br><span class="line">	<span class="comment">// 取出剩余所有数据</span></span><br><span class="line">	<span class="function">std::string <span class="title">RetrieveAllToStr</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 写指针位置</span></span><br><span class="line">	<span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">BeginWriteConst</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line">	<span class="function"><span class="type">char</span>* <span class="title">BeginWrite</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 添加到缓冲区中</span></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">Append</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* str, <span class="type">size_t</span> len)</span></span>;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">Append</span><span class="params">(<span class="type">const</span> std::string&amp; str)</span></span>;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">Append</span><span class="params">(<span class="type">const</span> <span class="type">void</span>* data, <span class="type">size_t</span> len)</span></span>;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">Append</span><span class="params">(<span class="type">const</span> Buffer&amp; buff)</span></span>;  <span class="comment">// 将读下表位置添加到写下标</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// httpconn中调用的读写接口</span></span><br><span class="line">	<span class="function"><span class="type">ssize_t</span> <span class="title">ReadFd</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span>* Errno)</span></span>;</span><br><span class="line">	<span class="function"><span class="type">sszie_t</span> <span class="title">WriteFd</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span>* Errno)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	<span class="comment">// buffer的开头</span></span><br><span class="line">	<span class="function"><span class="type">char</span>* <span class="title">BeginPtr_</span><span class="params">()</span></span>;  </span><br><span class="line">	<span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">BeginPtr_</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line">	<span class="comment">// 扩展空间</span></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">MakeSpace_</span><span class="params">(<span class="type">size_t</span> len)</span></span>;  </span><br><span class="line"></span><br><span class="line">	std::vector&lt;<span class="type">char</span>&gt; buffer_;  <span class="comment">// buffer缓冲区的存储实体</span></span><br><span class="line">	std::atomic&lt;std::<span class="type">size_t</span>&gt; readPos_;  <span class="comment">// 读的下标，即readIndex</span></span><br><span class="line">	std::atomic&lt;std::<span class="type">size_t</span>&gt; writePos_;  <span class="comment">// 写的下表，即writeIndex</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span> <span class="comment">// !BUFFER_NEW_H</span></span></span><br></pre></td></tr></table></figure>
+
+<p><strong>buffer.cpp</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * @Author  : Zhu Zhibo</span></span><br><span class="line"><span class="comment"> * @Data    : 2023/07/03</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;buffer_new.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 构造函数初始化</span></span><br><span class="line">Buffer::<span class="built_in">Buffer</span>(<span class="type">int</span> initBufferSize) : <span class="built_in">buffer_</span>(initBufferSize), <span class="built_in">readPos_</span>(<span class="number">0</span>), <span class="built_in">writePos_</span>(<span class="number">0</span>) &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// writeable长度</span></span><br><span class="line"><span class="function"><span class="type">size_t</span> <span class="title">Buffer::WritableBytes</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> buffer_.<span class="built_in">size</span>() - writePos_;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// readable长度</span></span><br><span class="line"><span class="function"><span class="type">size_t</span> <span class="title">Buffer::ReadableBytes</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> writePos_ - readPos_;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 预留空间prependable的长度</span></span><br><span class="line"><span class="function"><span class="type">size_t</span> <span class="title">Buffer::PrependableBytes</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> readPos_;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取读指针</span></span><br><span class="line"><span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">Buffer::Peek</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;buffer_[readPos];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 确保可写长度</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::EnsureWritable</span><span class="params">(<span class="type">size_t</span> len)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 判断可写长度是否够用，不够用则扩充</span></span><br><span class="line">	<span class="keyword">if</span> (len &gt; <span class="built_in">WritableBytes</span>()) <span class="built_in">MakeSpace_</span>(len);</span><br><span class="line">	<span class="built_in">assert</span>(len &lt;= <span class="built_in">WritableBytes</span>());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 移动写下标，在Append中使用</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::HasWritten</span><span class="params">(<span class="type">size_t</span> len)</span> </span>&#123;</span><br><span class="line">	writePos_ += len;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 读取len数据</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::Retrieve</span><span class="params">(<span class="type">size_t</span> len)</span> </span>&#123;</span><br><span class="line">	readPos_ += len;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 读取到end位置</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::RetrieveUntil</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* end)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">assert</span>(<span class="built_in">Peek</span>() &lt;= end);</span><br><span class="line">	<span class="built_in">Retrieve</span>(end - <span class="built_in">Peek</span>());  <span class="comment">// 长度=end指针-读指针</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 去除所有数据后的操作</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::RetrieveAll</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="built_in">bzero</span>(&amp;buffer_[<span class="number">0</span>], buffer_.<span class="built_in">size</span>());  <span class="comment">// 覆盖原有数据(清空数据)</span></span><br><span class="line">	readPos_ = writePos_ = <span class="number">0</span>;  <span class="comment">// 位置归0</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 读取剩余可读的str</span></span><br><span class="line"><span class="function">std::string <span class="title">Buffer::RetrieveAllToStr</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="function">std::string <span class="title">str</span><span class="params">(Peek(), ReadableBytes())</span></span>;</span><br><span class="line">	<span class="built_in">RetrieveAll</span>();  <span class="comment">// 读取完后清空</span></span><br><span class="line">	<span class="keyword">return</span> str;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">Buffer::BeginWriteConst</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;buffer_[writePos_];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">char</span>* <span class="title">Buffer::BeginWrite</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;buffer_[writePos_];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 添加字符串到缓冲区</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::Append</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* str, <span class="type">size_t</span> len)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">assert</span>(str);</span><br><span class="line">	<span class="built_in">EnsureWritable</span>(len);  <span class="comment">// 确保可写长度</span></span><br><span class="line">	std::<span class="built_in">copy</span>(str, str + len, <span class="built_in">BeginWrite</span>());  <span class="comment">// 将str放到写下标开始的地方</span></span><br><span class="line">	<span class="built_in">HasWritten</span>(len);  <span class="comment">// 移动写下标</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//下面三个调用上面的Append(cosnt char*,size_t)</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::Append</span><span class="params">(<span class="type">const</span> std::string&amp; str)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">Append</span>(str.<span class="built_in">c_str</span>(), str.<span class="built_in">length</span>());</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::Append</span><span class="params">(<span class="type">const</span> <span class="type">void</span>* data, <span class="type">size_t</span> len)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">Append</span>(<span class="built_in">static_cast</span>&lt;<span class="type">const</span> <span class="type">char</span>*&gt;(data), len);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//将buff中读下标的位置放在写当前buffer的写下标开始位置</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::Append</span><span class="params">(<span class="type">const</span> Buffer&amp; buff)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">Append</span>(buff.<span class="built_in">Peek</span>(), buff.<span class="built_in">ReadableBytes</span>());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 读接口：</span></span><br><span class="line"><span class="function"><span class="type">ssize_t</span> <span class="title">Buffer::ReadFd</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span>* Errno)</span> </span>&#123;</span><br><span class="line">	<span class="type">char</span> buff[<span class="number">65535</span>];  <span class="comment">// 栈区</span></span><br><span class="line">	<span class="keyword">struct</span> <span class="title class_">iovec</span> iov[<span class="number">2</span>];  <span class="comment">// 缓冲区</span></span><br><span class="line">	<span class="type">const</span> <span class="type">size_t</span> writable = <span class="built_in">WritableBytes</span>();</span><br><span class="line">	<span class="comment">// 分散读，保证数据全部读完</span></span><br><span class="line">	iov[<span class="number">0</span>].iov_base = <span class="built_in">BeginWrite</span>();</span><br><span class="line">	iov[<span class="number">0</span>].iov_len = writable;</span><br><span class="line">	iov[<span class="number">1</span>].iov_base = buff;</span><br><span class="line">	iov[<span class="number">1</span>].iov_len = <span class="built_in">sizeof</span>(buff);</span><br><span class="line"></span><br><span class="line">	<span class="type">ssize_t</span> len = <span class="built_in">readv</span>(fd, iov, <span class="number">2</span>);</span><br><span class="line">	<span class="keyword">if</span> (len &lt; <span class="number">0</span>) &#123;</span><br><span class="line">		*Errno = errno;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 小于说明写区可以容纳len</span></span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">static_cast</span>&lt;<span class="type">size_t</span>&gt;(len) &lt;= writable) &#123;</span><br><span class="line">		writePos_ += len;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 写区满了，下标移动到最后</span></span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		writePos_ = buffer_.<span class="built_in">size</span>();</span><br><span class="line">		<span class="built_in">Append</span>(buff, <span class="built_in">static_cast</span>&lt;<span class="type">size_t</span>&gt;(len - writable));</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> len;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 写接口：</span></span><br><span class="line"><span class="function"><span class="type">sszie_t</span> <span class="title">Buffer::WriteFd</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span>* Errno)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// write(int handle, void *buf, int nbyte);</span></span><br><span class="line">	<span class="type">ssize_t</span> len = <span class="built_in">write</span>(fd, <span class="built_in">Peek</span>(), <span class="built_in">ReadableBytes</span>());</span><br><span class="line">	<span class="keyword">if</span> (len &lt; <span class="number">0</span>) &#123;</span><br><span class="line">		*Errno = errno;</span><br><span class="line">		<span class="keyword">return</span> len;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">Retrieve</span>(len);</span><br><span class="line">	<span class="keyword">return</span> len;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">char</span>* <span class="title">Buffer::BeginPtr_</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;buffer_[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">Buffer::BeginPtr_</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;buffer_[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 扩展空间</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::MakeSpace_</span><span class="params">(<span class="type">size_t</span> len)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// len大于当前buffer_空间，直接扩充buffer_</span></span><br><span class="line">	<span class="keyword">if</span> (<span class="built_in">WritableBytes</span>() + <span class="built_in">PrependableBytes</span>() &lt; len) &#123;</span><br><span class="line">		buffer_.<span class="built_in">resize</span>(writePos_ + len + <span class="number">1</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 若小于等于，则将readPos_到writePos_数据拷贝至最前面</span></span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="type">size_t</span> readable = <span class="built_in">ReadableBytes</span>();</span><br><span class="line">		srd::<span class="built_in">copy</span>(<span class="built_in">BeginPtr_</span>() + readPos_, <span class="built_in">BeginPtr_</span>() + writePos_, <span class="built_in">BeginPtr_</span>());</span><br><span class="line">		readPos_ = <span class="number">0</span>;</span><br><span class="line">		writePos_ = readable;</span><br><span class="line">		<span class="built_in">asserr</span>(readable == ReadableBytes);</span><br><span class="line">	&#125;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+
+<p>​    外部使用的主要接口为<code>ReadFd</code>与 <code>WriteFd</code>，调用这两个接口进行I&#x2F;O的读写操作，这两个接口直接调用read()&#x2F;write()、readv()&#x2F;writev()来实现。</p>
+<p>​    至此Buffer类的所有内容就都完成啦！</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/07/03/TinyWebServer-1/" rel="prev" title="TinyWebServer-1">
+      <i class="fa fa-chevron-left"></i> TinyWebServer-1
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/07/03/TinyWebServer-3/" rel="next" title="TinyWebServer-3">
+      TinyWebServer-3 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E5%AE%9E%E7%8E%B0C-TinyWebServer-%E2%91%A1"><span class="nav-number">1.</span> <span class="nav-text">从零开始实现C++TinyWebServer-②</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Buffer%E7%B1%BB"><span class="nav-number">1.1.</span> <span class="nav-text">Buffer类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E4%B8%8E%E4%BB%A3%E7%A0%81"><span class="nav-number">1.2.</span> <span class="nav-text">实现与代码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ivoec%E7%BB%93%E6%9E%84%E4%BD%93%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">1.2.1.</span> <span class="nav-text">ivoec结构体的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E4%BB%A3%E7%A0%81"><span class="nav-number">1.2.2.</span> <span class="nav-text">具体代码</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ZzBoAYU"
+      src="/images/touxiang.gif">
+  <p class="site-author-name" itemprop="name">ZzBoAYU</p>
+  <div class="site-description" itemprop="description">-珍惜眼前人-</div>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZzBobo0915" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZzBobo0915" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhuzhibo0915@163.com" title="E-Mail → mailto:zhuzhibo0915@163.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+<!-- 侧栏网易云音乐 -->
+<div id="music163player">
+  <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=110 src="//music.163.com/outchain/player?type=0&id=8369008493&auto=0&height=90"></iframe>
+</divb>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZzBoAYU</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">52k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:10</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+
+</body>
+</html>

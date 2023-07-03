@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/background_favicon32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/background_favicon16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":300,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":null,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":"Trebuchet","preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="FCOS笔记1.FCOS基本《FCOS: A Simple and Strong Anchor-free Object Detector》 FCOS 第二篇paper地址：https:&#x2F;&#x2F;arxiv.org&#x2F;pdf&#x2F;1904.01355.pdf FCOS 第二篇paper地址：https:&#x2F;&#x2F;arxiv.org&#x2F;pdf&#x2F;2006.09214.pdf FCOS code地址：https:&#x2F;&#x2F;gith">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FCOS笔记">
+<meta property="og:url" content="http://example.com/2023/04/21/FCOS%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="ZzBoAYU HOME">
+<meta property="og:description" content="FCOS笔记1.FCOS基本《FCOS: A Simple and Strong Anchor-free Object Detector》 FCOS 第二篇paper地址：https:&#x2F;&#x2F;arxiv.org&#x2F;pdf&#x2F;1904.01355.pdf FCOS 第二篇paper地址：https:&#x2F;&#x2F;arxiv.org&#x2F;pdf&#x2F;2006.09214.pdf FCOS code地址：https:&#x2F;&#x2F;gith">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2023/04/21/FCOS%E7%AC%94%E8%AE%B0/fcos_structure-16820799089041.png">
+<meta property="og:image" content="http://example.com/2023/04/21/FCOS%E7%AC%94%E8%AE%B0/fcos_structure_gai-16820799089052.png">
+<meta property="og:image" content="http://example.com/2023/04/21/FCOS%E7%AC%94%E8%AE%B0/fcos_loss-16820799089053.png">
+<meta property="og:image" content="http://example.com/2023/04/21/FCOS%E7%AC%94%E8%AE%B0/fcos_loss_expr-16820799089054.png">
+<meta property="og:image" content="http://example.com/2023/04/21/FCOS%E7%AC%94%E8%AE%B0/centerness-16820799089055.png">
+<meta property="og:image" content="http://example.com/2023/04/21/FCOS%E7%AC%94%E8%AE%B0/regression-16820799089056.png">
+<meta property="article:published_time" content="2023-04-21T12:24:48.000Z">
+<meta property="article:modified_time" content="2023-04-21T13:09:54.771Z">
+<meta property="article:author" content="ZzBoAYU">
+<meta property="article:tag" content="目标检测">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2023/04/21/FCOS%E7%AC%94%E8%AE%B0/fcos_structure-16820799089041.png">
+
+<link rel="canonical" href="http://example.com/2023/04/21/FCOS%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>FCOS笔记 | ZzBoAYU HOME</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"><a target="_blank" rel="noopener" href="https://github.com/ZzBobo0915" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#fff; color:#151513; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">ZzBoAYU HOME</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">AYU是我最爱的姑娘</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/21/FCOS%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/touxiang.gif">
+      <meta itemprop="name" content="ZzBoAYU">
+      <meta itemprop="description" content="-珍惜眼前人-">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZzBoAYU HOME">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          FCOS笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-04-21 20:24:48 / 修改时间：21:09:54" itemprop="dateCreated datePublished" datetime="2023-04-21T20:24:48+08:00">2023-04-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="FCOS笔记"><a href="#FCOS笔记" class="headerlink" title="FCOS笔记"></a>FCOS笔记</h1><h2 id="1-FCOS基本"><a href="#1-FCOS基本" class="headerlink" title="1.FCOS基本"></a>1.FCOS基本</h2><p>《FCOS: A Simple and Strong Anchor-free Object Detector》</p>
+<p>FCOS 第二篇paper地址：<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/1904.01355.pdf">https://arxiv.org/pdf/1904.01355.pdf</a></p>
+<p>FCOS 第二篇paper地址：<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2006.09214.pdf">https://arxiv.org/pdf/2006.09214.pdf</a></p>
+<p>FCOS code地址：<a target="_blank" rel="noopener" href="https://github.com/tianzhi0549/FCOS">https://github.com/tianzhi0549/FCOS</a></p>
+<h3 id="1-1-核心概念"><a href="#1-1-核心概念" class="headerlink" title="1.1 核心概念"></a>1.1 核心概念</h3><p>​    将锚框转换为铺设锚点进行物体检测。</p>
+<p>​    FCOS是基于无锚框（Anchor-Free）的目标检测方法，是指将锚框（Anchor-Based）中的对锚框分类与回归转变为：对锚点进行分类与回归，其中回归是预测这个锚点到检测框上下左右四条边界的距离。</p>
+<h3 id="1-2-Anchor-Based的缺点"><a href="#1-2-Anchor-Based的缺点" class="headerlink" title="1.2 Anchor-Based的缺点"></a>1.2 Anchor-Based的缺点</h3><ul>
+<li>Anchor-Based对检测框anchor的大小、数量、长款都比较敏感</li>
+<li>固定尺寸size和纵横比aspext ratio的锚框不利于检测器的泛化能力，导致对不同任务，anchor可能需要重新设置大小和尺寸</li>
+<li>为了达到更好的效果，需要生成很多的anchor，但是大部分anchor都为负样本，造成了样本的不均衡</li>
+<li>在训练中，需要计算所有anchor与真实框的IOU，消耗大量资源内存资源与时间</li>
+</ul>
+<h3 id="1-3-FCOS优点"><a href="#1-3-FCOS优点" class="headerlink" title="1.3 FCOS优点"></a>1.3 FCOS优点</h3><ul>
+<li>检测问题完全交给FCN去处理，可以复用到其他任务上，比如语义分割、关键点检测</li>
+<li>anchor-free方法减少了参数的设计，使训练更简单</li>
+<li>不需要计算IOU，节省资源</li>
+</ul>
+<h2 id="2-FCOS网络结构"><a href="#2-FCOS网络结构" class="headerlink" title="2.FCOS网络结构"></a>2.FCOS网络结构</h2><h3 id="2-1-原始的FCOS"><a href="#2-1-原始的FCOS" class="headerlink" title="2.1 原始的FCOS"></a>2.1 原始的FCOS</h3><img src="/2023/04/21/FCOS%E7%AC%94%E8%AE%B0/fcos_structure-16820799089041.png" class="" title="FCOS Structure">
+
+<p>​    初始的FCOS网络如上图所示，C3、C4、C5代表了骨干网络的特征映射，P3-P7为最终预测所使用的特征层，hw为特征图的高和宽，最左侧为下采样比例。</p>
+<p>​    然后将P3-P7输入检测头，每个检测头head包含以下三个分支：</p>
+<ul>
+<li>Classification分支：预测类别分支，预测类别，图中的C即表示类别</li>
+<li>Center-ness分支：中心度分支，一个锚点对应一个中心都，用于锚点相对检测框中心的判断</li>
+<li>Regression分支：回归位置分支，用来回归正样本锚点到检测框的距离，图中的4表示<code>l t r b</code>即上下左右四条边界</li>
+</ul>
+<p>​    改进前Classification分支既包含了正、负样本锚点的类别预测分支，又包含了正、负样本锚点中心性判断的center-ness分支。</p>
+<h3 id="2-2-改进的FCOS"><a href="#2-2-改进的FCOS" class="headerlink" title="2.2 改进的FCOS"></a>2.2 改进的FCOS</h3><p>​    后来发现Center-ness分支与Regression分支放在一起更好，所以就将这二者放在了一起：</p>
+<p>​    下图引自我的b站导师：<a href="https://link.zhihu.com/?target=https://blog.csdn.net/qq_37541097/article/details/124844726?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522165884537116782246451205%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fblog.%2522%257D&request_id=165884537116782246451205&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~blog~first_rank_ecpm_v1~rank_v31_ecpm-2-124844726-null-null.185%5Ev2%5Econtrol&utm_term=fpn&spm=1018.2226.3001.4450">FCOS网络解析_太阳花的小绿豆的博客-CSDN博客_fcos网络</a></p>
+<img src="/2023/04/21/FCOS%E7%AC%94%E8%AE%B0/fcos_structure_gai-16820799089052.png" class="" title="改进的FCOS Structure">
+
+<h3 id="2-3-损失函数"><a href="#2-3-损失函数" class="headerlink" title="2.3 损失函数"></a>2.3 损失函数</h3><p>​    以改进版的损失函数为例，Head总共有三个输出分支，故损失由分类损失 L_cls、定位损失 L_rcs与center-ness损失 L_ctrness三部分组成 ：</p>
+<img src="/2023/04/21/FCOS%E7%AC%94%E8%AE%B0/fcos_loss-16820799089053.png" class="" title="FCOS损失函数">
+
+<p>   其中：</p>
+<img src="/2023/04/21/FCOS%E7%AC%94%E8%AE%B0/fcos_loss_expr-16820799089054.png" class="" title="参数详解">
+
+<ul>
+<li><p>分类损失L_cls采用 BCE Loss+Focal Loss，计算损失时所有样本都会参与</p>
+</li>
+<li><p>定位损失L_rcs次啊用GIoU Loss（即现在的IoU Loss），计算损失时只有正样本参与</p>
+</li>
+<li><p>center-ness损失L_ctrness采用BCE Loss，计算损失时只有正样本参与，s*x,y的计算公式如下：<img src="/2023/04/21/FCOS%E7%AC%94%E8%AE%B0/centerness-16820799089055.png" class="" title="center-ness损失"></p>
+<p>  center-ness距离GT（ground truth框，即人工标注的真实样本框）中心点越近，centerness*值越大，反之越小。在推理时，center-ness还可以类别权重，在NMS（非极大值抑制）中，其排序所用的置信度由center-ness与类别概率（类别得分）得到</p>
+</li>
+</ul>
+<h2 id="3-正样本、负样本、模糊样本的定义"><a href="#3-正样本、负样本、模糊样本的定义" class="headerlink" title="3.正样本、负样本、模糊样本的定义"></a>3.正样本、负样本、模糊样本的定义</h2><h3 id="3-1-正样本、负样本"><a href="#3-1-正样本、负样本" class="headerlink" title="3.1 正样本、负样本"></a>3.1 正样本、负样本</h3><p>​    有目标的就是正样本、没有目标的就是负样本。</p>
+<p>​    对于anchor-free来说，锚点落在了特征图上的GT框内，他就是正样本，否则就是负样本。</p>
+<h3 id="3-2-模糊样本"><a href="#3-2-模糊样本" class="headerlink" title="3.2 模糊样本"></a>3.2 模糊样本</h3><p>​    FCOS里的模糊样本指的是那些锚点落在多个GT框的样本，一般取最小的GT框作为回归目标。</p>
+<h2 id="4-特征图上的点映回原图"><a href="#4-特征图上的点映回原图" class="headerlink" title="4.特征图上的点映回原图"></a>4.特征图上的点映回原图</h2><p>​    为了知道特征图上的点在原图的位置，我们需要上采样，根据总体的stride来定义上采样倍率</p>
+<h2 id="5-锚点回归值"><a href="#5-锚点回归值" class="headerlink" title="5.锚点回归值"></a>5.锚点回归值</h2><p>​    锚点回归的回归计算公式如下所示，其中(l∗,t∗,r∗,b∗)是锚点距离物体的真实标注框左、上、右、下边界的距离，(x,y)为特征图上锚点映射到原图上的位置；在回归分支中，每个锚点预测一个四维向量，即四条边界，网络能把每个锚点距离真实标准框的距离预测的越准，说明检测效果越好：</p>
+<img src="/2023/04/21/FCOS%E7%AC%94%E8%AE%B0/regression-16820799089056.png" class="">
+
+<h2 id="6-模糊样本的处理"><a href="#6-模糊样本的处理" class="headerlink" title="6.模糊样本的处理"></a>6.模糊样本的处理</h2><p>​    采用FPN时会将大小不同的anchor放置在不同大小的特征图上，特征图越小，感受野越大，用来检测更大的物体，FCOS采用5个不同大小的特征图P3-P7(P_i)，stride对应8,16,32,64,128。</p>
+<p>​    在anchor-based中，根据anchor与GT框的IoU来匹配，而FCOS直接通过限制不同特征图上的回归目标值来达到这一目的，每个特征图P都会设定一个回归下限值与回归上限值，作为其回归距离的限制。如果特征图上P_i的坐标点(x,y)满足小于下限或大于上限，这个特征层就将其设置为负样本，不再进行回归。</p>
+<h2 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_45377629/article/details/124844405">https://blog.csdn.net/weixin_45377629/article/details/124844405</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44135282/article/details/89703818">https://blog.csdn.net/weixin_44135282/article/details/89703818</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/" rel="tag"># 目标检测</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/04/20/knowledge-summarize/" rel="prev" title="暑期实习知识点总结">
+      <i class="fa fa-chevron-left"></i> 暑期实习知识点总结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/04/22/BlendMask%E7%AC%94%E8%AE%B0/" rel="next" title="BlendMask笔记">
+      BlendMask笔记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#FCOS%E7%AC%94%E8%AE%B0"><span class="nav-number">1.</span> <span class="nav-text">FCOS笔记</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-FCOS%E5%9F%BA%E6%9C%AC"><span class="nav-number">1.1.</span> <span class="nav-text">1.FCOS基本</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1 核心概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-Anchor-Based%E7%9A%84%E7%BC%BA%E7%82%B9"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.2 Anchor-Based的缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-FCOS%E4%BC%98%E7%82%B9"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.3 FCOS优点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-FCOS%E7%BD%91%E7%BB%9C%E7%BB%93%E6%9E%84"><span class="nav-number">1.2.</span> <span class="nav-text">2.FCOS网络结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E5%8E%9F%E5%A7%8B%E7%9A%84FCOS"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.1 原始的FCOS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E6%94%B9%E8%BF%9B%E7%9A%84FCOS"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.2 改进的FCOS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="nav-number">1.2.3.</span> <span class="nav-text">2.3 损失函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%AD%A3%E6%A0%B7%E6%9C%AC%E3%80%81%E8%B4%9F%E6%A0%B7%E6%9C%AC%E3%80%81%E6%A8%A1%E7%B3%8A%E6%A0%B7%E6%9C%AC%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">1.3.</span> <span class="nav-text">3.正样本、负样本、模糊样本的定义</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E6%AD%A3%E6%A0%B7%E6%9C%AC%E3%80%81%E8%B4%9F%E6%A0%B7%E6%9C%AC"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1 正样本、负样本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E6%A8%A1%E7%B3%8A%E6%A0%B7%E6%9C%AC"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2 模糊样本</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%89%B9%E5%BE%81%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9%E6%98%A0%E5%9B%9E%E5%8E%9F%E5%9B%BE"><span class="nav-number">1.4.</span> <span class="nav-text">4.特征图上的点映回原图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E9%94%9A%E7%82%B9%E5%9B%9E%E5%BD%92%E5%80%BC"><span class="nav-number">1.5.</span> <span class="nav-text">5.锚点回归值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E6%A8%A1%E7%B3%8A%E6%A0%B7%E6%9C%AC%E7%9A%84%E5%A4%84%E7%90%86"><span class="nav-number">1.6.</span> <span class="nav-text">6.模糊样本的处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%EF%BC%9A"><span class="nav-number">1.7.</span> <span class="nav-text">参考：</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ZzBoAYU"
+      src="/images/touxiang.gif">
+  <p class="site-author-name" itemprop="name">ZzBoAYU</p>
+  <div class="site-description" itemprop="description">-珍惜眼前人-</div>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZzBobo0915" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZzBobo0915" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhuzhibo0915@163.com" title="E-Mail → mailto:zhuzhibo0915@163.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+<!-- 侧栏网易云音乐 -->
+<div id="music163player">
+  <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=110 src="//music.163.com/outchain/player?type=0&id=8369008493&auto=0&height=90"></iframe>
+</divb>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZzBoAYU</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">52k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:10</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+
+</body>
+</html>

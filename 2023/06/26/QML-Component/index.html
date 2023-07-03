@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/background_favicon32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/background_favicon16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":300,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":null,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":"Trebuchet","preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="QML-Component详解​    Component（组件）是Qt QML中的重要元素，用于定义可重用的QML元素，可以视作为自定义控件，要注意：  Component只能包含一个顶层的Item或者实例，而且这个在Item之外不能定义除了id以外的任何数据 Component通常用来给一个视图（ListView等）提供图形化组件 Component不是Item的派生类，而是从QQmlComp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="QML-Component">
+<meta property="og:url" content="http://example.com/2023/06/26/QML-Component/index.html">
+<meta property="og:site_name" content="ZzBoAYU HOME">
+<meta property="og:description" content="QML-Component详解​    Component（组件）是Qt QML中的重要元素，用于定义可重用的QML元素，可以视作为自定义控件，要注意：  Component只能包含一个顶层的Item或者实例，而且这个在Item之外不能定义除了id以外的任何数据 Component通常用来给一个视图（ListView等）提供图形化组件 Component不是Item的派生类，而是从QQmlComp">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-06-26T10:23:16.000Z">
+<meta property="article:modified_time" content="2023-06-26T11:02:37.131Z">
+<meta property="article:author" content="ZzBoAYU">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2023/06/26/QML-Component/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>QML-Component | ZzBoAYU HOME</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"><a target="_blank" rel="noopener" href="https://github.com/ZzBobo0915" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#fff; color:#151513; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">ZzBoAYU HOME</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">AYU是我最爱的姑娘</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/26/QML-Component/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/touxiang.gif">
+      <meta itemprop="name" content="ZzBoAYU">
+      <meta itemprop="description" content="-珍惜眼前人-">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZzBoAYU HOME">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          QML-Component
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-06-26 18:23:16 / 修改时间：19:02:37" itemprop="dateCreated datePublished" datetime="2023-06-26T18:23:16+08:00">2023-06-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Qt/" itemprop="url" rel="index"><span itemprop="name">Qt</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>345</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="QML-Component详解"><a href="#QML-Component详解" class="headerlink" title="QML-Component详解"></a>QML-Component详解</h1><p>​    Component（组件）是Qt QML中的重要元素，用于定义可重用的QML元素，可以视作为自定义控件，要注意：</p>
+<ul>
+<li>Component只能包含一个顶层的Item或者实例，而且这个在Item之外不能定义除了id以外的任何数据</li>
+<li>Component通常用来给一个视图（ListView等）提供图形化组件</li>
+<li>Component不是Item的派生类，而是从QQmlComponent继承而来的，虽然它通过自己的顶层Item为其他的View提供可视化组件，但它本身不是可见元素</li>
+</ul>
+<p>​    下面是Component在视图中的一个应用</p>
+<figure class="highlight qml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">    <span class="title">ColumnLayout</span>&#123;</span><br><span class="line">        <span class="attribute">anchors.fill</span>: <span class="built_in">parent</span></span><br><span class="line">        <span class="title">Item</span>&#123;</span><br><span class="line">            <span class="attribute">Layout.fillWidth</span>: <span class="literal">true</span></span><br><span class="line">            <span class="attribute">Layout.preferredHeight</span>: <span class="number">150</span></span><br><span class="line">            <span class="title">MusicBorderImage</span>&#123;</span><br><span class="line">                <span class="attribute">anchors.centerIn</span>: <span class="built_in">parent</span></span><br><span class="line">                <span class="attribute">height</span>: <span class="number">100</span></span><br><span class="line">                <span class="attribute">width</span>: <span class="number">100</span></span><br><span class="line">                <span class="attribute">borderRadius</span>: <span class="number">100</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 列表菜单</span></span><br><span class="line">        <span class="title">ListView</span>&#123;</span><br><span class="line">            <span class="comment">//id: menuListView</span></span><br><span class="line">            <span class="attribute">id:</span><span class="string"> menuView</span></span><br><span class="line">            <span class="attribute">height</span>: <span class="built_in">parent</span>.height</span><br><span class="line">            <span class="attribute">Layout.fillHeight</span>: <span class="literal">true</span></span><br><span class="line">            <span class="attribute">Layout.fillWidth</span>: <span class="literal">true</span></span><br><span class="line">            <span class="attribute">model</span>: <span class="title">ListModel</span>&#123;</span><br><span class="line">                <span class="attribute">id:</span><span class="string"> menuViewModel</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="attribute">delegate</span>: menuViewDelegate</span><br><span class="line">            <span class="attribute">highlight</span>: <span class="title">Rectangle</span>&#123;</span><br><span class="line">                <span class="attribute">color</span>: <span class="string">&quot;#f1efed&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="attribute">highlightMoveDuration</span>: <span class="number">10</span>    <span class="comment">// 设置切换列表中的变形时间</span></span><br><span class="line">            <span class="attribute">highlightResizeDuration</span>: <span class="number">10</span>  <span class="comment">// 设置下拉列表的变形时间</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Component作为代理为ListView提供可视化组件</span></span><br><span class="line">    <span class="title">Component</span> &#123;</span><br><span class="line">        <span class="attribute">id:</span><span class="string"> menuViewDelegate</span></span><br><span class="line">        <span class="title">Rectangle</span>&#123;</span><br><span class="line">            <span class="attribute">id:</span><span class="string"> menuViewDelegateItem</span></span><br><span class="line">            <span class="attribute">width</span>: <span class="number">200</span></span><br><span class="line">            <span class="attribute">height</span>: <span class="number">50</span></span><br><span class="line">            <span class="attribute">color</span>: menuView.isCurrentItem?<span class="string">&quot;#f1efed&quot;</span>:<span class="string">&quot;#ffffff&quot;</span></span><br><span class="line">            <span class="title">RowLayout</span>&#123;</span><br><span class="line">                <span class="attribute">anchors.fill</span>: <span class="built_in">parent</span></span><br><span class="line">                <span class="attribute">anchors.centerIn</span>: <span class="built_in">parent</span></span><br><span class="line">                <span class="attribute">spacing</span>: <span class="number">15</span></span><br><span class="line">                <span class="title">Item</span>&#123;</span><br><span class="line">                   <span class="attribute">width</span>: <span class="number">30</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="title">Image</span>&#123;</span><br><span class="line">                    <span class="attribute">source</span>: <span class="string">&quot;qrc:/images/&quot;</span>+icon</span><br><span class="line">                    <span class="attribute">Layout.preferredHeight</span>: <span class="number">20</span></span><br><span class="line">                    <span class="attribute">Layout.preferredWidth</span>: <span class="number">20</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="title">Text</span>&#123;</span><br><span class="line">                    <span class="attribute">text</span>: value</span><br><span class="line">                    <span class="attribute">Layout.fillWidth</span>: <span class="literal">true</span></span><br><span class="line">                    <span class="attribute">height</span>: <span class="number">50</span></span><br><span class="line">                    <span class="attribute">font.family</span>: <span class="built_in">window</span>.mFONT_FAMILY</span><br><span class="line">                    <span class="attribute">font.pointSize</span>: <span class="number">12</span></span><br><span class="line">                    <span class="attribute">color</span>: <span class="string">&quot;#000000&quot;</span></span><br><span class="line">                &#125;</span><br><span class="line">         &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// onCompleted表示</span></span><br><span class="line">    <span class="attribute">Component.onCompleted</span>: &#123;</span><br><span class="line">        menuViewModel.append(qmlList.filter(item=&gt;item.menu))</span><br><span class="line">        <span class="keyword">var</span> loader = repeater.itemAt(defaultIndex)</span><br><span class="line">        loader.visible = <span class="literal">true</span></span><br><span class="line">        loader.source = qmlList[defaultIndex].qml + <span class="string">&quot;.qml&quot;</span></span><br><span class="line">        menuView.currentIndex = defaultIndex</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 作为一个嵌入式的Component必须用Loader来显示</span></span><br><span class="line"><span class="title">Repeater</span>&#123;  <span class="comment">// 重复构造</span></span><br><span class="line">    <span class="attribute">id:</span><span class="string"> repeater</span></span><br><span class="line">    <span class="attribute">model</span>: qmlList.length  <span class="comment">// filter过滤</span></span><br><span class="line">    <span class="title">Loader</span> &#123;</span><br><span class="line">       <span class="attribute">visible</span>: <span class="literal">false</span></span><br><span class="line">       <span class="attribute">Layout.fillWidth</span>: <span class="literal">true</span></span><br><span class="line">       <span class="attribute">Layout.fillHeight</span>: <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/06/01/Qt-socket/" rel="prev" title="Qt-socket">
+      <i class="fa fa-chevron-left"></i> Qt-socket
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/07/03/TinyWebServer-1/" rel="next" title="TinyWebServer-1">
+      TinyWebServer-1 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#QML-Component%E8%AF%A6%E8%A7%A3"><span class="nav-number">1.</span> <span class="nav-text">QML-Component详解</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ZzBoAYU"
+      src="/images/touxiang.gif">
+  <p class="site-author-name" itemprop="name">ZzBoAYU</p>
+  <div class="site-description" itemprop="description">-珍惜眼前人-</div>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZzBobo0915" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZzBobo0915" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhuzhibo0915@163.com" title="E-Mail → mailto:zhuzhibo0915@163.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+<!-- 侧栏网易云音乐 -->
+<div id="music163player">
+  <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=110 src="//music.163.com/outchain/player?type=0&id=8369008493&auto=0&height=90"></iframe>
+</divb>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZzBoAYU</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">52k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:10</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+
+</body>
+</html>

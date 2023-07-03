@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/background_favicon32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/background_favicon16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":300,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":null,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":"Trebuchet","preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="AdelaiDet中的BiFPN代码详解(更新中)AdelaiDet中的bifpn模块代码位于adet&#x2F;modeling&#x2F;backbone&#x2F;bifpn.py中，主要的为三个部分：  BiFPN模块 构建backbone网络结构的BackboneWithTopLevels模块 单层的FPN结构SignleBiFPN模块  ​    通过注册为框架可使用的backbone">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BiFPN代码详解">
+<meta property="og:url" content="http://example.com/2023/04/25/BiFPN%E4%BB%A3%E7%A0%81%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="ZzBoAYU HOME">
+<meta property="og:description" content="AdelaiDet中的BiFPN代码详解(更新中)AdelaiDet中的bifpn模块代码位于adet&#x2F;modeling&#x2F;backbone&#x2F;bifpn.py中，主要的为三个部分：  BiFPN模块 构建backbone网络结构的BackboneWithTopLevels模块 单层的FPN结构SignleBiFPN模块  ​    通过注册为框架可使用的backbone">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-04-25T07:01:21.000Z">
+<meta property="article:modified_time" content="2023-05-06T06:51:26.749Z">
+<meta property="article:author" content="ZzBoAYU">
+<meta property="article:tag" content="实例分割">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2023/04/25/BiFPN%E4%BB%A3%E7%A0%81%E8%AF%A6%E8%A7%A3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>BiFPN代码详解 | ZzBoAYU HOME</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"><a target="_blank" rel="noopener" href="https://github.com/ZzBobo0915" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#fff; color:#151513; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">ZzBoAYU HOME</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">AYU是我最爱的姑娘</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/25/BiFPN%E4%BB%A3%E7%A0%81%E8%AF%A6%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/touxiang.gif">
+      <meta itemprop="name" content="ZzBoAYU">
+      <meta itemprop="description" content="-珍惜眼前人-">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZzBoAYU HOME">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          BiFPN代码详解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-04-25 15:01:21" itemprop="dateCreated datePublished" datetime="2023-04-25T15:01:21+08:00">2023-04-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-05-06 14:51:26" itemprop="dateModified" datetime="2023-05-06T14:51:26+08:00">2023-05-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="AdelaiDet中的BiFPN代码详解-更新中"><a href="#AdelaiDet中的BiFPN代码详解-更新中" class="headerlink" title="AdelaiDet中的BiFPN代码详解(更新中)"></a>AdelaiDet中的BiFPN代码详解(更新中)</h1><p>AdelaiDet中的bifpn模块代码位于adet&#x2F;modeling&#x2F;backbone&#x2F;bifpn.py中，主要的为三个部分：</p>
+<ul>
+<li>BiFPN模块</li>
+<li>构建backbone网络结构的BackboneWithTopLevels模块</li>
+<li>单层的FPN结构SignleBiFPN模块</li>
+</ul>
+<p>​    <strong>通过注册为框架可使用的backbone：</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 在yaml中使用 </span></span><br><span class="line"><span class="comment">#MODEL:</span></span><br><span class="line"><span class="comment">#  BACKBONE:</span></span><br><span class="line"><span class="comment">#    NAME: &quot;build_fcos_resnet_bifpn_backbone&quot;</span></span><br><span class="line"><span class="meta">@BACKBONE_REGISTRY.register()</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">build_fcos_resnet_bifpn_backbone</span>(<span class="params">cfg, input_shape: ShapeSpec</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">        cfg: a detectron2 CfgNode</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Returns:</span></span><br><span class="line"><span class="string">        backbone (Backbone): backbone module, must be a subclass of :class:`Backbone`.</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">if</span> cfg.MODEL.MOBILENET:</span><br><span class="line">        bottom_up = build_mnv2_backbone(cfg, input_shape)</span><br><span class="line">    <span class="keyword">else</span>:  <span class="comment"># resnet</span></span><br><span class="line">        bottom_up = build_resnet_backbone(cfg, input_shape)</span><br><span class="line">    in_features = cfg.MODEL.BiFPN.IN_FEATURES</span><br><span class="line">    out_channels = cfg.MODEL.BiFPN.OUT_CHANNELS</span><br><span class="line">    num_repeats = cfg.MODEL.BiFPN.NUM_REPEATS</span><br><span class="line">    top_levels = cfg.MODEL.FCOS.TOP_LEVELS</span><br><span class="line">    <span class="comment"># 下面的注释为我自己训练的参数，参数具体解释间后面的BiFPN模块</span></span><br><span class="line">    backbone = BiFPN(</span><br><span class="line">        bottom_up=bottom_up,  </span><br><span class="line">        in_features=in_features,    <span class="comment"># [res3,res4,res5]/[res2,res3,res4,res5]</span></span><br><span class="line">        out_channels=out_channels,  <span class="comment"># 256</span></span><br><span class="line">        num_top_levels=top_levels,  <span class="comment"># 2/1</span></span><br><span class="line">        num_repeats=num_repeats,    <span class="comment"># 6</span></span><br><span class="line">        norm=cfg.MODEL.BiFPN.NORM   <span class="comment"># 为空</span></span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">return</span> backbone</span><br></pre></td></tr></table></figure>
+
+<p>​    <strong>下面的内容除非有 ‘&#x2F;‘ 分开表示的，其他默认为 in_features&#x3D;[res2,res3,res4,res5]的情况！！！</strong></p>
+<h2 id="BiFPN模块"><a href="#BiFPN模块" class="headerlink" title="BiFPN模块"></a>BiFPN模块</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 分割字母和后面的数字，比如将&#x27;res3&#x27;分为&#x27;res&#x27;与&#x27;3&#x27;</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">split_name</span>(<span class="params">name</span>):</span><br><span class="line">    <span class="keyword">for</span> i, c <span class="keyword">in</span> <span class="built_in">enumerate</span>(name):</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> c.isalpha():</span><br><span class="line">            <span class="keyword">return</span> name[:i], <span class="built_in">int</span>(name[i:])</span><br><span class="line">    <span class="keyword">raise</span> ValueError()</span><br><span class="line">    </span><br><span class="line"><span class="keyword">class</span> <span class="title class_">BiFPN</span>(<span class="title class_ inherited__">Backbone</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    This module implements Feature Pyramid Network.</span></span><br><span class="line"><span class="string">    It creates pyramid features built on top of some input feature maps.</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params"></span></span><br><span class="line"><span class="params">        self, bottom_up, in_features, out_channels, num_top_levels, num_repeats, norm=<span class="string">&quot;&quot;</span></span></span><br><span class="line"><span class="params">    </span>):</span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        Args:</span></span><br><span class="line"><span class="string">            bottom_up (Backbone): module representing the bottom up subnetwork.</span></span><br><span class="line"><span class="string">                Must be a subclass of :class:`Backbone`. The multi-scale feature</span></span><br><span class="line"><span class="string">                maps generated by the bottom up network, and listed in `in_features`,</span></span><br><span class="line"><span class="string">                are used to generate FPN levels.</span></span><br><span class="line"><span class="string">            in_features (list[str]): names of the input feature maps coming</span></span><br><span class="line"><span class="string">                from the backbone to which FPN is attached. For example, if the</span></span><br><span class="line"><span class="string">                backbone produces [&quot;res2&quot;, &quot;res3&quot;, &quot;res4&quot;], any *contiguous* sublist</span></span><br><span class="line"><span class="string">                of these may be used; order must be from high to low resolution.</span></span><br><span class="line"><span class="string">            out_channels (int): number of channels in the output feature maps.</span></span><br><span class="line"><span class="string">            num_top_levels (int): the number of the top levels (p6 or p7).</span></span><br><span class="line"><span class="string">            num_repeats (int): the number of repeats of BiFPN.</span></span><br><span class="line"><span class="string">            norm (str): the normalization to use.</span></span><br><span class="line"><span class="string">            ---------------------------------------</span></span><br><span class="line"><span class="string">            bottom_up (Backbone): 必须是Backbone的子类，多尺度特侦图列在in_features中，用于生成FPN levels</span></span><br><span class="line"><span class="string">            in_features (list[str]): 输入特征图的名称，顺序必须为高分辨率到低分辨率，例如如果骨干网路输出到BiFPN的为[res2,res3,res4]，则可使用其中任意连续的子序列</span></span><br><span class="line"><span class="string">            out_channels (int): 输出特征图的channels</span></span><br><span class="line"><span class="string">            num_top_levels (int): 顶层的数量（p6或p7）1时为p6，2时为p7</span></span><br><span class="line"><span class="string">            num_repeats (int): BiFPN的重复次数</span></span><br><span class="line"><span class="string">            norm (str): the normalization to use.</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="built_in">super</span>(BiFPN, self).__init__()</span><br><span class="line">        <span class="keyword">assert</span> <span class="built_in">isinstance</span>(bottom_up, Backbone)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 构建backbone网络结构，要注意self.bottom_up与bottom_up区别</span></span><br><span class="line">        <span class="comment"># add extra feature levels (i.e., 6 and 7)</span></span><br><span class="line">        self.bottom_up = BackboneWithTopLevels(</span><br><span class="line">            bottom_up, out_channels,</span><br><span class="line">            num_top_levels, norm</span><br><span class="line">        )</span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        BackboneWithTopLevels处理后的bottom_up：</span></span><br><span class="line"><span class="string">        &#123;   [res3,res4,res5] 2</span></span><br><span class="line"><span class="string">            &#x27;res3&#x27;: ShapeSpec(channels=512, height=None, width=None, stride=8),  </span></span><br><span class="line"><span class="string">            &#x27;res4&#x27;: ShapeSpec(channels=1024, height=None, width=None, stride=16), </span></span><br><span class="line"><span class="string">            &#x27;res5&#x27;: ShapeSpec(channels=2048, height=None, width=None, stride=32), </span></span><br><span class="line"><span class="string">            &#x27;res6&#x27;: ShapeSpec(channels=256, height=None, width=None, stride=64), </span></span><br><span class="line"><span class="string">            &#x27;res7&#x27;: ShapeSpec(channels=256, height=None, width=None, stride=128)</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">        &#123;   [res2,res3,res4,res5] 1</span></span><br><span class="line"><span class="string">            &#x27;res2&#x27;: ShapeSpec(channels=256, height=None, width=None, stride=4), </span></span><br><span class="line"><span class="string">            &#x27;res3&#x27;: ShapeSpec(channels=512, height=None, width=None, stride=8), </span></span><br><span class="line"><span class="string">            &#x27;res4&#x27;: ShapeSpec(channels=1024, height=None, width=None, stride=16), </span></span><br><span class="line"><span class="string">            &#x27;res5&#x27;: ShapeSpec(channels=2048, height=None, width=None, stride=32), </span></span><br><span class="line"><span class="string">            &#x27;res6&#x27;: ShapeSpec(channels=256, height=None, width=None, stride=64)&#125;</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        bottom_up_output_shapes = self.bottom_up.output_shape()</span><br><span class="line"></span><br><span class="line">        <span class="comment">#pdb.set_trace()</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># in_features [res3, res4, res5, res6, res7]/[&#x27;res2&#x27;, &#x27;res3&#x27;, &#x27;res4&#x27;, &#x27;res5&#x27;, &#x27;res6&#x27;]</span></span><br><span class="line">        in_features = <span class="built_in">sorted</span>(in_features, key=<span class="keyword">lambda</span> x: split_name(x)[<span class="number">1</span>])</span><br><span class="line">        self._size_divisibility = bottom_up_output_shapes[in_features[-<span class="number">1</span>]].stride  <span class="comment"># 最后一个in_features（res6/res5）的stride</span></span><br><span class="line">        self.out_channels = out_channels</span><br><span class="line">        self.min_level = split_name(in_features[<span class="number">0</span>])[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">        <span class="comment"># add the names for top blocks</span></span><br><span class="line">        prefix, last_suffix = split_name(in_features[-<span class="number">1</span>])  <span class="comment"># split_name分割为字母与数字</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(num_top_levels):</span><br><span class="line">            in_features.append(prefix + <span class="built_in">str</span>(last_suffix + i + <span class="number">1</span>))</span><br><span class="line">        self.in_features = in_features</span><br><span class="line"></span><br><span class="line">        <span class="comment"># generate output features</span></span><br><span class="line">        self._out_features = [<span class="string">&quot;p&#123;&#125;&quot;</span>.<span class="built_in">format</span>(split_name(name)[<span class="number">1</span>]) <span class="keyword">for</span> name <span class="keyword">in</span> in_features]  <span class="comment">#[&#x27;p2&#x27;,&#x27;p3&#x27;,&#x27;p4&#x27;,&#x27;p5&#x27;,&#x27;p6&#x27;]</span></span><br><span class="line">        <span class="comment"># 和输入特征的步长对应&#123;&#x27;p2&#x27;: 4, &#x27;p3&#x27;: 8, &#x27;p4&#x27;: 16, &#x27;p5&#x27;: 32, &#x27;p6&#x27;: 64&#125;</span></span><br><span class="line">        self._out_feature_strides = &#123;</span><br><span class="line">            out_name: bottom_up_output_shapes[in_name].stride</span><br><span class="line">            <span class="keyword">for</span> out_name, in_name <span class="keyword">in</span> <span class="built_in">zip</span>(self._out_features, in_features)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment"># 都为输出的channels&#123;&#x27;p2&#x27;: 256, &#x27;p3&#x27;: 256, &#x27;p4&#x27;: 256, &#x27;p5&#x27;: 256, &#x27;p6&#x27;: 256&#125;</span></span><br><span class="line">        self._out_feature_channels = &#123;k: out_channels <span class="keyword">for</span> k <span class="keyword">in</span> self._out_features&#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">#pdb.set_trace()</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># build bifpn</span></span><br><span class="line">        <span class="comment"># 构建多级的FPN结构，其中SingleBiFPM实现了单层的FPN结构</span></span><br><span class="line">        self.repeated_bifpn = nn.ModuleList()</span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">            i = 0时   in_channels_list = [256, 512, 1024, 2048, 256]</span></span><br><span class="line"><span class="string">            i = 其他时 in_channels_list = [256, 256, 256, 256, 256]</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(num_repeats):</span><br><span class="line">            <span class="keyword">if</span> i == <span class="number">0</span>:</span><br><span class="line">                in_channels_list = [</span><br><span class="line">                    bottom_up_output_shapes[name].channels <span class="keyword">for</span> name <span class="keyword">in</span> in_features</span><br><span class="line">                ]</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                in_channels_list = [</span><br><span class="line">                    self._out_feature_channels[name] <span class="keyword">for</span> name <span class="keyword">in</span> self._out_features</span><br><span class="line">                ]</span><br><span class="line">            self.repeated_bifpn.append(SingleBiFPN(</span><br><span class="line">                in_channels_list, out_channels, norm</span><br><span class="line">            ))</span><br><span class="line">            <span class="comment">#pdb.set_trace()</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">    @property</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">size_divisibility</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> self._size_divisibility</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">        Args:</span></span><br><span class="line"><span class="string">            input (dict[str-&gt;Tensor]): mapping feature map name (e.g., &quot;p5&quot;) to</span></span><br><span class="line"><span class="string">                feature map tensor for each feature level in high to low resolution order.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        Returns:</span></span><br><span class="line"><span class="string">            dict[str-&gt;Tensor]:</span></span><br><span class="line"><span class="string">                mapping from feature map name to FPN feature map tensor</span></span><br><span class="line"><span class="string">                in high to low resolution order. Returned feature names follow the FPN</span></span><br><span class="line"><span class="string">                paper convention: &quot;p&lt;stage&gt;&quot;, where stage has stride = 2 ** stage e.g.,</span></span><br><span class="line"><span class="string">                [&quot;n2&quot;, &quot;n3&quot;, ..., &quot;n6&quot;].</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        bottom_up_features = self.bottom_up(x)  <span class="comment"># resnet</span></span><br><span class="line">        feats = [bottom_up_features[f] <span class="keyword">for</span> f <span class="keyword">in</span> self.in_features]</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 这里体现联级，将第一层的FPN输出到feats，再次送入第二层FPN</span></span><br><span class="line">        <span class="keyword">for</span> bifpn <span class="keyword">in</span> self.repeated_bifpn:</span><br><span class="line">            <span class="comment">#pdb.set_trace()</span></span><br><span class="line">            feats = bifpn(feats)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">dict</span>(<span class="built_in">zip</span>(self._out_features, feats))</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="BackboneWithTopLevels"><a href="#BackboneWithTopLevels" class="headerlink" title="BackboneWithTopLevels"></a>BackboneWithTopLevels</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">BackboneWithTopLevels</span>(<span class="title class_ inherited__">Backbone</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, backbone, out_channels, num_top_levels, norm=<span class="string">&quot;&quot;</span></span>):</span><br><span class="line">        <span class="built_in">super</span>(BackboneWithTopLevels, self).__init__()</span><br><span class="line">        <span class="comment"># 下面的参数很好理解，都是backbone中的一些参数</span></span><br><span class="line">        self.backbone = backbone</span><br><span class="line">        backbone_output_shape = backbone.output_shape()</span><br><span class="line"></span><br><span class="line">        self._out_feature_channels = &#123;name: shape.channels <span class="keyword">for</span> name, shape <span class="keyword">in</span> backbone_output_shape.items()&#125;</span><br><span class="line">        self._out_feature_strides = &#123;name: shape.stride <span class="keyword">for</span> name, shape <span class="keyword">in</span> backbone_output_shape.items()&#125;</span><br><span class="line">        self._out_features = <span class="built_in">list</span>(self._out_feature_strides.keys())</span><br><span class="line"></span><br><span class="line">        last_feature_name = <span class="built_in">max</span>(self._out_feature_strides.keys(), key=<span class="keyword">lambda</span> x: split_name(x)[<span class="number">1</span>])</span><br><span class="line">        self.last_feature_name = last_feature_name</span><br><span class="line">        self.num_top_levels = num_top_levels</span><br><span class="line"></span><br><span class="line">        last_channels = self._out_feature_channels[last_feature_name]</span><br><span class="line">        last_stride = self._out_feature_strides[last_feature_name]</span><br><span class="line"></span><br><span class="line">        prefix, suffix = split_name(last_feature_name)</span><br><span class="line">        prev_channels = last_channels</span><br><span class="line"></span><br><span class="line">        <span class="comment">#pdb.set_trace()</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(num_top_levels):</span><br><span class="line">            name = prefix + <span class="built_in">str</span>(suffix + i + <span class="number">1</span>)</span><br><span class="line">            self.add_module(name, FeatureMapResampler(</span><br><span class="line">                prev_channels, out_channels, <span class="number">2</span>, norm</span><br><span class="line">            ))</span><br><span class="line">            prev_channels = out_channels</span><br><span class="line"></span><br><span class="line">            self._out_feature_channels[name] = out_channels</span><br><span class="line">            self._out_feature_strides[name] = last_stride * <span class="number">2</span> ** (i + <span class="number">1</span>)</span><br><span class="line">            self._out_features.append(name)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        outputs = self.backbone(x)</span><br><span class="line">        <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">            outputs[&#x27;res2&#x27;].shape = [8, 256, 40, 32]</span></span><br><span class="line"><span class="string">            outputs[&#x27;res3&#x27;].shape = [8, 512, 20, 16]</span></span><br><span class="line"><span class="string">            outputs[&#x27;res4&#x27;].shape = [8, 1024, 10, 8]</span></span><br><span class="line"><span class="string">            outputs[&#x27;res5&#x27;].shape = [8, 2048, 5, 4]</span></span><br><span class="line"><span class="string">        &quot;&quot;&quot;</span></span><br><span class="line">        last_features = outputs[self.last_feature_name]</span><br><span class="line">        prefix, suffix = split_name(self.last_feature_name)</span><br><span class="line"></span><br><span class="line">        x = last_features</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(self.num_top_levels):</span><br><span class="line">            name = prefix + <span class="built_in">str</span>(suffix + i + <span class="number">1</span>)</span><br><span class="line">            x = self.__getattr__(name)(x)</span><br><span class="line">            outputs[name] = x</span><br><span class="line">        <span class="string">&quot;&quot;&quot;  通过上面outputs新增了一个outputs[&#x27;res6&#x27;] shape=[8, 256, 3, 2];  &quot;&quot;&quot;</span></span><br><span class="line">        <span class="comment">#pdb.set_trace()</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> outputs</span><br></pre></td></tr></table></figure>
+
+<h2 id="SingleBiFPN"><a href="#SingleBiFPN" class="headerlink" title="SingleBiFPN"></a>SingleBiFPN</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%AE%9E%E4%BE%8B%E5%88%86%E5%89%B2/" rel="tag"># 实例分割</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/04/24/BlendMask%E4%BB%A3%E7%A0%81%E8%AF%A6%E8%A7%A3/" rel="prev" title="BlendMask代码详解">
+      <i class="fa fa-chevron-left"></i> BlendMask代码详解
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/05/06/Qt%E7%9F%A5%E8%AF%86%E7%82%B9/" rel="next" title="Qt知识点">
+      Qt知识点 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#AdelaiDet%E4%B8%AD%E7%9A%84BiFPN%E4%BB%A3%E7%A0%81%E8%AF%A6%E8%A7%A3-%E6%9B%B4%E6%96%B0%E4%B8%AD"><span class="nav-number">1.</span> <span class="nav-text">AdelaiDet中的BiFPN代码详解(更新中)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#BiFPN%E6%A8%A1%E5%9D%97"><span class="nav-number">1.1.</span> <span class="nav-text">BiFPN模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BackboneWithTopLevels"><span class="nav-number">1.2.</span> <span class="nav-text">BackboneWithTopLevels</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SingleBiFPN"><span class="nav-number">1.3.</span> <span class="nav-text">SingleBiFPN</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ZzBoAYU"
+      src="/images/touxiang.gif">
+  <p class="site-author-name" itemprop="name">ZzBoAYU</p>
+  <div class="site-description" itemprop="description">-珍惜眼前人-</div>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZzBobo0915" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZzBobo0915" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhuzhibo0915@163.com" title="E-Mail → mailto:zhuzhibo0915@163.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+<!-- 侧栏网易云音乐 -->
+<div id="music163player">
+  <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=110 src="//music.163.com/outchain/player?type=0&id=8369008493&auto=0&height=90"></iframe>
+</divb>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZzBoAYU</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">52k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:10</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+
+</body>
+</html>

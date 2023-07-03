@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/background_favicon32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/background_favicon16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":300,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":null,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":"Trebuchet","preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="从零开始实现C++TinyWebServer-①​    记录一下重新学习c++11新标准构建的TinyuWebServer！ 参考代码地址：https:&#x2F;&#x2F;github.com&#x2F;ZzBobo0915&#x2F;TinyWebServer&#x2F;blob&#x2F;master 什么是WebServer​    WebServer是一种基于B&#x2F;S架构的软件程序，服务器用来处理来自客户端（浏览器）发来的HTTP请求">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TinyWebServer-1">
+<meta property="og:url" content="http://example.com/2023/07/03/TinyWebServer-1/index.html">
+<meta property="og:site_name" content="ZzBoAYU HOME">
+<meta property="og:description" content="从零开始实现C++TinyWebServer-①​    记录一下重新学习c++11新标准构建的TinyuWebServer！ 参考代码地址：https:&#x2F;&#x2F;github.com&#x2F;ZzBobo0915&#x2F;TinyWebServer&#x2F;blob&#x2F;master 什么是WebServer​    WebServer是一种基于B&#x2F;S架构的软件程序，服务器用来处理来自客户端（浏览器）发来的HTTP请求">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2023/07/03/TinyWebServer-1/web-server-16883467860613.svg">
+<meta property="article:published_time" content="2023-07-03T01:02:24.000Z">
+<meta property="article:modified_time" content="2023-07-03T10:34:28.268Z">
+<meta property="article:author" content="ZzBoAYU">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2023/07/03/TinyWebServer-1/web-server-16883467860613.svg">
+
+<link rel="canonical" href="http://example.com/2023/07/03/TinyWebServer-1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>TinyWebServer-1 | ZzBoAYU HOME</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"><a target="_blank" rel="noopener" href="https://github.com/ZzBobo0915" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#fff; color:#151513; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">ZzBoAYU HOME</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">AYU是我最爱的姑娘</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/03/TinyWebServer-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/touxiang.gif">
+      <meta itemprop="name" content="ZzBoAYU">
+      <meta itemprop="description" content="-珍惜眼前人-">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZzBoAYU HOME">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          TinyWebServer-1
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-07-03 09:02:24 / 修改时间：18:34:28" itemprop="dateCreated datePublished" datetime="2023-07-03T09:02:24+08:00">2023-07-03</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/WebServer/" itemprop="url" rel="index"><span itemprop="name">WebServer</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="从零开始实现C-TinyWebServer-①"><a href="#从零开始实现C-TinyWebServer-①" class="headerlink" title="从零开始实现C++TinyWebServer-①"></a>从零开始实现C++TinyWebServer-①</h1><p>​    记录一下重新学习c++11新标准构建的TinyuWebServer！</p>
+<p>参考代码地址：<a target="_blank" rel="noopener" href="https://github.com/ZzBobo0915/TinyWebServer/blob/master">https://github.com/ZzBobo0915/TinyWebServer/blob/master</a></p>
+<h2 id="什么是WebServer"><a href="#什么是WebServer" class="headerlink" title="什么是WebServer"></a>什么是WebServer</h2><p>​    WebServer是一种基于B&#x2F;S架构的软件程序，服务器用来处理来自客户端（浏览器）发来的HTTP请求，并对其请求进行HTTP响应：向浏览器提供HTML界面、图像、CSS和JS等Web资源。</p>
+<h2 id="WebServer如何和用户进行通信"><a href="#WebServer如何和用户进行通信" class="headerlink" title="WebServer如何和用户进行通信"></a>WebServer如何和用户进行通信</h2><p>​    一个WebServer想要和用户进行通信，需要在浏览器中输入<strong>域名或IP地址:端口号</strong>，浏览器会先对你的域名解析成DNS或者直接根据你的IP地址:端口号向对应的Web服务器发送一个HTTP请求，进行三次握手连接与服务器建立连接，然后发送HTTP请求报文给服务器，这个报文中包含了请求行、请求头部、空行和主体(请求数据)四个内容，通过TCP&#x2F;TP协议发送到Web服务器上。</p>
+<img src="/2023/07/03/TinyWebServer-1/web-server-16883467860613.svg" class="" title="WebServer通信过程">
+
+<p>​    WebServer通过通过socket监听来自用户的请求：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"><span class="comment">// 创建监听socket的文件描述符</span></span><br><span class="line"><span class="type">int</span> listenfd = socket(AF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line"><span class="comment">// 创建监听socket的TCP的IPV4地址</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">address</span>;</span></span><br><span class="line">bzero(&amp;address, <span class="keyword">sizeof</span>(address));</span><br><span class="line">address.sin_family = AF_INET;</span><br><span class="line">address.sin_port = htons(port);</span><br><span class="line"><span class="comment">// INADDR_ANY表示将套接字绑定到任意可用的端口</span></span><br><span class="line">address.sin_addr.s_addr = htonl(INADDR_ANY);</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> flag = <span class="number">1</span>;</span><br><span class="line"><span class="comment">// SO_REUSEADDR表示端口可以重复使用</span></span><br><span class="line">setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &amp;flag, <span class="keyword">sizeof</span>(flag));</span><br><span class="line"><span class="comment">// 绑定socket和地址</span></span><br><span class="line">ret = bind(listenfd, (<span class="keyword">struct</span> sockaddr*)&amp;address, <span class="keyword">sizeof</span>(address));</span><br><span class="line"><span class="comment">// 创建监听的队列</span></span><br><span class="line">ret = listen(listenfd, <span class="number">5</span>);</span><br></pre></td></tr></table></figure>
+
+<h2 id="I-x2F-O的五种模型"><a href="#I-x2F-O的五种模型" class="headerlink" title="I&#x2F;O的五种模型"></a>I&#x2F;O的五种模型</h2><ol>
+<li>阻塞I&#x2F;O：用户线程发送I&#x2F;O请求后会等待阻塞数据是否就绪，若未就绪则阻塞等待，直到数据就绪在会解除阻塞等待</li>
+<li>非阻塞I&#x2F;O：用户线程发送I&#x2F;O请求后不会阻塞等待数据是否就绪，而是会不停地去请求直到有数据才进行I&#x2F;O操作，但是期间不会释放cpu资源</li>
+<li>信号驱动I&#x2F;O：当用户线程需要读写操作时，给对应的套接字发送一个信号，用户线程继续执行，直到数据就绪时会发送给用户线程一个信号，用户线程接收到信号后进行I&#x2F;O操作</li>
+<li>多路复用I&#x2F;O：I&#x2F;O多路复用中主线程通过轮询的方式监听多个socket状态，直到有一个或多个socket状态发生变化才会进行I&#x2F;O操作</li>
+<li>异步I&#x2F;O：用户线程发送I&#x2F;O请求后，可以立刻去做别的事情，内核等待数据就绪后，就将数据拷贝到用户线程时，整个过程用户线程完全不知道I&#x2F;O操作是如何进行的</li>
+</ol>
+<p>​    <strong>同步I&#x2F;O与异步I&#x2F;O的区别的实质其实就是内核发送给用户线程的状态，同步I&#x2F;O中发送的是数据的就绪态，异步I&#x2F;O中发送的是数据的完成态。</strong></p>
+<h2 id="如何实现一个高并发的WebServer"><a href="#如何实现一个高并发的WebServer" class="headerlink" title="如何实现一个高并发的WebServer"></a>如何实现一个高并发的WebServer</h2><p>​    使用多路复用I&#x2F;O来实现一个高并发的WebServer：</p>
+<p>​    Web服务器通过socket来监听用户的请求，很多用户尝试connect()这个socket套接字，监听到的这些连接会被排队等待accept()，由于用户连接是随机到达的异步事件，每当监听socket监听到新的连接并放在监听队列中，我们都需要告诉Web服务器有连接来了，accept()这个连接并分配一个逻辑单元来处理这个用户请求。而且在处理这个请求的同时，还需要继续监听其他客户的请求并分配其另一个逻辑单元来处理，这就是并发。</p>
+<p>​    Linux下可以使用三种技术来进行I&#x2F;O多路复用：select、poll、epoll。</p>
+<ol>
+<li>select：基于轮询机制的数组，在一段时间内，监听用户所感兴趣的套接字上的读、写和异常事件。每次调用select都需要复制两次fd_set数组，开销大；需要全部变了才知道哪些文件描述符有I&#x2F;O操作；有监听上限：32位系统最多能监听1024个文件描述符，64位为2048个；只有水平触发LT模式。</li>
+<li>poll：采用链表方式替代fd_set数组，可以突破监听文件描述符的1024&#x2F;2048的上限，poll函数返回的是需要进行I&#x2F;O操作的文件描述符，只需遍历返回的数组即可，效率变高；只有水平触发LT模式。</li>
+<li>epoll：在内核使用<strong>红黑树</strong>来监控所有待检测的socket，不用传入整个socket合集，只需要传入待检测的socket，减少了内核和用户空间的数据拷贝与内存分配；采用事件驱动(回调函数)机制，内核维护了一个<strong>链表</strong>来记录有事件产生的就绪事件，只将有事件发生的socket合集传递给用户态应用程序，提高了效率；支持水平触发LT与边缘触发ET。</li>
+</ol>
+<p>​    虽然I&#x2F;O复用可以同时监听多个socket，但是它本身是阻塞的，并且当有多个文件描述符同时就绪的时候，如果不采取额外的措施，程序只能按照顺序一个一个处理文件描述符，所有可以采用线程池来实现多线程并发，为每个就绪的文件描述符分配一个逻辑单元(线程)来处理。</p>
+<h2 id="事件处理模式"><a href="#事件处理模式" class="headerlink" title="事件处理模式"></a>事件处理模式</h2><p>​    有两种事件处理模式：</p>
+<ol>
+<li>Reactor模式：主线程(I&#x2F;O处理单元)只负责监听文件描述符上是否有事件发生，若有则立即通知工作线程(逻辑单元)，将socket事件放入请求队列，交给工作线程处理，<strong>这个过程是同步的，读取完数据后应用进程才能处理数据。</strong></li>
+<li>Proactor模式：将所有的I&#x2F;O操作都交给主线程和内核来处理，工作线程只负责处理逻辑，如主线程读操作完成后user[sockfd].read()，选择一个工作线程来处理客户请求pool-&gt;append(users+sockfd)</li>
+</ol>
+<p>​    通俗理解为Reactor下主线程是大老板，只负责接收和通知下属(工作线程)来处理I&#x2F;O操作，自己啥也不干；而Proactor模式下主线程是小老板，不仅需要接收，还需要自己和内核一起处理I&#x2F;O操作，交给下属(工作线程)的只是逻辑方面的内容。<strong>举个实际生活中的例子，Reactor 模式就是快递员在楼下，给你打电话告诉你快递到你家小区了，你需要自己下楼来拿快递。而在 Proactor 模式下，快递员直接将快递送到你家门口，然后通知你。</strong></p>
+<p>​    无论是Reactor还是Proactor，都是一种基于【事件分发】的网络编程模式，区别是Reactor是基于【待完成】的I&#x2F;O事件，而Proactor是基于【已完成】的I&#x2F;O事件。</p>
+<p>​    <strong>理论上Proactor模式更快，由于Proactor模式的异步I&#x2F;O在linux下没有异步I&#x2F;O接口，通常都是由同步I&#x2F;O模拟异步I&#x2F;O，即主线程完成读写后通知工作线程，但是意义不大，所以大部分都是采用Reactor模式。</strong></p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>​    完成了对整个WebServer基础的基本了解，无代码，就当作复习了。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/06/26/QML-Component/" rel="prev" title="QML-Component">
+      <i class="fa fa-chevron-left"></i> QML-Component
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/07/03/TinyWebServer-2/" rel="next" title="TinyWebServer-2">
+      TinyWebServer-2 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E5%AE%9E%E7%8E%B0C-TinyWebServer-%E2%91%A0"><span class="nav-number">1.</span> <span class="nav-text">从零开始实现C++TinyWebServer-①</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFWebServer"><span class="nav-number">1.1.</span> <span class="nav-text">什么是WebServer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WebServer%E5%A6%82%E4%BD%95%E5%92%8C%E7%94%A8%E6%88%B7%E8%BF%9B%E8%A1%8C%E9%80%9A%E4%BF%A1"><span class="nav-number">1.2.</span> <span class="nav-text">WebServer如何和用户进行通信</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#I-x2F-O%E7%9A%84%E4%BA%94%E7%A7%8D%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.3.</span> <span class="nav-text">I&#x2F;O的五种模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E9%AB%98%E5%B9%B6%E5%8F%91%E7%9A%84WebServer"><span class="nav-number">1.4.</span> <span class="nav-text">如何实现一个高并发的WebServer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.5.</span> <span class="nav-text">事件处理模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.6.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ZzBoAYU"
+      src="/images/touxiang.gif">
+  <p class="site-author-name" itemprop="name">ZzBoAYU</p>
+  <div class="site-description" itemprop="description">-珍惜眼前人-</div>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/ZzBobo0915" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;ZzBobo0915" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhuzhibo0915@163.com" title="E-Mail → mailto:zhuzhibo0915@163.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+<!-- 侧栏网易云音乐 -->
+<div id="music163player">
+  <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=110 src="//music.163.com/outchain/player?type=0&id=8369008493&auto=0&height=90"></iframe>
+</divb>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZzBoAYU</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">52k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:10</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/clicklove.js"></script>
+
+</body>
+</html>
