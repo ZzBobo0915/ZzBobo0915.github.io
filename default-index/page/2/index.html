@@ -188,6 +188,125 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/22/BlendMask%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/touxiang.gif">
+      <meta itemprop="name" content="ZzBoAYU">
+      <meta itemprop="description" content="-珍惜眼前人-">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZzBoAYU HOME">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/04/22/BlendMask%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">BlendMask笔记</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-04-22 10:10:24 / 修改时间：10:56:29" itemprop="dateCreated datePublished" datetime="2023-04-22T10:10:24+08:00">2023-04-22</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>863</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="实例分割算法BlendMask"><a href="#实例分割算法BlendMask" class="headerlink" title="实例分割算法BlendMask"></a>实例分割算法BlendMask</h1><p>论文地址：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2001.00309">https://arxiv.org/abs/2001.00309</a></p>
+<p>github代码：<a target="_blank" rel="noopener" href="https://github.com/aim-uofa/AdelaiDet">https://github.com/aim-uofa/AdelaiDet</a></p>
+<h2 id="密集实例分割"><a href="#密集实例分割" class="headerlink" title="密集实例分割"></a>密集实例分割</h2><p>​    密集实例分割主要分为自上而下top-down与自下而上bottom-up两类方法：</p>
+<h3 id="Top-down方法"><a href="#Top-down方法" class="headerlink" title="Top-down方法"></a>Top-down方法</h3><p>​    top-down方法主要表现为先检测后分割，先通过一些方法获得box区域，然后对区域内的像素进行mask提取，比如著名的Mask-RCNN就是top-down方法。</p>
+<p>​    这种模型一般有以下问题：</p>
+<ol>
+<li>特征和mask之间的局部一致性会丢失</li>
+<li>冗余的特征提取，不同的bbox会重新提取一次mask</li>
+<li>由于使用了缩小的特征图卷积，位置信息会损失</li>
+</ol>
+<h3 id="Bottom-up方法"><a href="#Bottom-up方法" class="headerlink" title="Bottom-up方法"></a>Bottom-up方法</h3><p>​    bottom-up方法将整个图进行逐像素的预测（per-pixel prediction），然后按照聚类等方法，对每个像素做embedding，最后group出不同的instance。虽然保留个更好的低层特征，但是效果一般略差于top-down方法。</p>
+<p>​    这种模型一般存在以下问题：</p>
+<ol>
+<li>严重依赖逐像素预测的质量，容易导致非最优的分割</li>
+<li>由于mask在低维度提取，对于复杂场景的分割能力有限</li>
+<li>需要复杂的后处理方法</li>
+</ol>
+<h3 id="混合方法"><a href="#混合方法" class="headerlink" title="混合方法"></a>混合方法</h3><p>​    BlendMask主要结合了top-down与botton-up两种思路，利用t-d方法生成实例级别的高维信息（如bbox），利用b-u方法生成per-pixel的预测进行融合。基于FCOS，融合的方法借鉴FCIS（裁剪）与YOLACT（权重加法）的思想，提出了blender模块，更好的将实例级别的全局信息与提供细节的底层特征融合。</p>
+<h2 id="总体思路"><a href="#总体思路" class="headerlink" title="总体思路"></a>总体思路</h2><img src="/2023/04/22/BlendMask%E7%AC%94%E8%AE%B0/image-20230422102619797.png" class="" title="BlendMask整体架构">
+
+<p>   整体架构如上图所示，包含一个detector模块与BlendMask模块。detector模块直接采用的FCOS，BlendMask模块分为三部分：</p>
+<ul>
+<li>Bottom Module：对底层特征进行处理，生成的score map称为Bases</li>
+<li>Top Layer：串联在检测器的box head上，生成Base对应的top level attention</li>
+<li>Blender：将Bases与attention融合</li>
+</ul>
+<h3 id="Bottom-Module"><a href="#Bottom-Module" class="headerlink" title="Bottom Module"></a>Bottom Module</h3><p>​    采用Deelpabv3+的decoder，包含两个输入，一个低层特征一个高层特征，对高层特征进行上采用后与低层特征融合输出，</p>
+<img src="/2023/04/22/BlendMask%E7%AC%94%E8%AE%B0/image-20230422103608570.png" class="" title="Deeplabv3+结构">
+
+<p>​    bottom输出的feature特征为：(N * K * H&#x2F;s * W&#x2F;s)，N为channel，K为bases的数量，(H,W)为输入的size，s为scroe的步长。</p>
+<h3 id="Top-Layer"><a href="#Top-Layer" class="headerlink" title="Top Layer"></a>Top Layer</h3><p>​    在检测的特征金字塔的每一层后都加了一层卷积，用来预测top-level attentions(A)，输出的特征为：(N * (K*M*M)) * H_i * W_i)，M*M为attention的分辨率，即对应的base的每个像素点的权重值，包含的粒度更细。</p>
+<h3 id="Blender"><a href="#Blender" class="headerlink" title="Blender"></a>Blender</h3><p>​    Blender的输入为bottom的输出B、top-level的输出attentions(A)和bbox(P)，该部分的融合如下：</p>
+<ol>
+<li>使用RoiPooler来裁取每个bbox对应的区域，并resize成固定的RxR大小的特征图。训练时直接使用ground truth bbox作为propasals，而在推理时直接用FCOS的结果<img src="/2023/04/22/BlendMask%E7%AC%94%E8%AE%B0/image-20230422104735998.png" class="" title="RoIPool"></li>
+<li>attention的大小M是比R小的，因此需要插值，这里采用的双线性插值，从MxM变为RxR<img src="/2023/04/22/BlendMask%E7%AC%94%E8%AE%B0/image-20230422105051459.png" class="" title="attention上采样"></li>
+<li>接着插值完的attention进行softmax，产生一组score map<img src="/2023/04/22/BlendMask%E7%AC%94%E8%AE%B0/image-20230422105309801.png" class="" title="attention的score map"></li>
+<li>对每个r_d和对应的s_d进行逐像素的相加，最后将K个结果相加得到m_d<img src="/2023/04/22/BlendMask%E7%AC%94%E8%AE%B0/image-20230422105357473.png" class=""></li>
+</ol>
+<p>​    可视化的blender过程：</p>
+<img src="/2023/04/22/BlendMask%E7%AC%94%E8%AE%B0/image-20230422105439280.png" class="" title="可视化过程">
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/21/FCOS%E7%AC%94%E8%AE%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -777,12 +896,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">54k</span>
+    <span title="站点总字数">55k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">3:15</span>
+    <span title="站点阅读时长">3:19</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
