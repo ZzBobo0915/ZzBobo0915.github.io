@@ -188,6 +188,129 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/10/TinyWebServer-%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/touxiang.gif">
+      <meta itemprop="name" content="ZzBoAYU">
+      <meta itemprop="description" content="-珍惜眼前人-">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZzBoAYU HOME">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/07/10/TinyWebServer-%E6%80%BB%E7%BB%93/" class="post-title-link" itemprop="url">TinyWebServer-总结</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-07-10 10:34:14 / 修改时间：13:45:54" itemprop="dateCreated datePublished" datetime="2023-07-10T10:34:14+08:00">2023-07-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/WebServer/" itemprop="url" rel="index"><span itemprop="name">WebServer</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="从零实现自己的c-TinyWebServer-总结"><a href="#从零实现自己的c-TinyWebServer-总结" class="headerlink" title="从零实现自己的c++TinyWebServer-总结"></a>从零实现自己的c++TinyWebServer-总结</h1><h2 id="为什么要做这么一个项目？"><a href="#为什么要做这么一个项目？" class="headerlink" title="为什么要做这么一个项目？"></a>为什么要做这么一个项目？</h2><p>​    因为研究生阶段做的都是一些深度学习相关的知识，感觉自身对与后台开发知识有点薄弱，故此想学习一下有关后台开发的相关知识，同时还能巩固c++11的特性，操作系统、网络编程等知识点。</p>
+<h2 id="项目背景"><a href="#项目背景" class="headerlink" title="项目背景"></a>项目背景</h2><p>​    该项目设计的知识由Modern C++、网络编程、多线程编程、linux库函数等，参开了高性能服务器与Linux多线程服务器两本数据，以及一些开源代码进行开发，代码量约3000行。</p>
+<h2 id="项目描述（重点）"><a href="#项目描述（重点）" class="headerlink" title="项目描述（重点）"></a>项目描述（重点）</h2><p>​    该项目的总体框架采用的是<strong>单Reactor多线程模型</strong>，在主线程中通过I&#x2F;O多路复用监听多个文件描述符上的事件。主线程负责连接的建立与断开，把读写和逻辑处理函数加入线程池的任务队列，由<strong>线程池</strong>中的子线程完成响应的读写操作，实现任务的高并发。在最底层实现了自动增长的<strong>Buffer缓冲区</strong>，在应用层方面实现心跳机制，通过<strong>定时器</strong>清理不活跃的连接以减少高并发场景下不必要的系统资源占用。对于<strong>HTTP请求报文</strong>，采用分散读进行读取，使用<strong>有限状态机</strong>对请求报文进行解析，并且通过集中写与内存映射的方法对<strong>响应报文</strong>进行传输，还实现了<strong>数据库</strong>功能，采用RAII机制实现数据库连接池，可以实现基本的注册登录功能。最后还加入了<strong>日志模块</strong>帮助项目开发和记录日常使用的情况。</p>
+<h2 id="项目功能（重点）"><a href="#项目功能（重点）" class="headerlink" title="项目功能（重点）"></a>项目功能（重点）</h2><ul>
+<li>利用I&#x2F;O多路复用技术epoll与线程池实现多线程Reactor的高并发模型</li>
+<li>利用标准库容器vector实现了自动增长的Buffer缓冲区</li>
+<li>基于小根堆与双向升序链表实现定时器，对不活跃的活动进行处理</li>
+<li>使用有限状态机与正则表达式对请求报文进行解析，并发送响应报文</li>
+<li>利用RAII机制实现了数据库连接池，实现了注册登录功能</li>
+<li>利用懒汉单例模式与阻塞队列实现了异步的日志系统</li>
+</ul>
+<h2 id="项目流程（重点）"><a href="#项目流程（重点）" class="headerlink" title="项目流程（重点）"></a>项目流程（重点）</h2><ul>
+<li><p>通过构造WevServer类的对象传递参数进行服务器参数相关的设定</p>
+<p>  主要参数有：线程池数量、是否优雅关闭、触发模式、日志是否开启、日志的异步数量等</p>
+</li>
+<li><p>通过设定的参数对服务器的各个模块进行初始化</p>
+<p>  主要有：日志、数据库连接池、线程池、HTTP对象、阻塞队列等</p>
+</li>
+<li><p>服务器各个模块初始化完毕后，主线程I&#x2F;O复用监听事件的循环</p>
+<p>  监听是否有事件发生：</p>
+<ul>
+<li>新连接进入：初始化HTTP连接，添加读事件，设置非阻塞</li>
+</ul>
+<ol>
+<li><p>读事件：调整定时器事件，读任务放进线程池，抢占式地执行；</p>
+<p> 执行读事件最主要的是完成一个非阻塞读取调用知道读完，将数据缓存到用户缓冲区中，接着执行一个消息解析的操作，根据是否解析成功判断来决定是重新注册读事件还是写事件。解析成功就制作响应报文并注册写事件，如果解析失败则重新注册读事件并等待下次读取更多数据直到完成一个完整的HTTP请求</p>
+</li>
+</ol>
+<ul>
+<li>写事件</li>
+<li>异常事件：关闭连接并移除监听事件和定时器</li>
+</ul>
+</li>
+</ul>
+<h2 id="HTTP请求报文的解析与HTTP响应报文的制作"><a href="#HTTP请求报文的解析与HTTP响应报文的制作" class="headerlink" title="HTTP请求报文的解析与HTTP响应报文的制作"></a>HTTP请求报文的解析与HTTP响应报文的制作</h2><p>​    解析采用的是有限状态机与正则表达式，每次都读取**’’\r\n’<strong>为结尾的一段字符串，通过状态机来判断获取的字符串属于哪一部分（请求行，请求报头，请求正文），再跳转到相应的函数进行解析，如果读取的字符串没有以’\r\n’结尾说明此次获取的数据不完整，返回解析失败并重新注册读事件，解析的时候判断是否有</strong>POST<strong>请求，如果是的话需要解析POST的数据，包含了登录注册的用户信息，这时通过数据库连接池去进行业务逻辑的判断，这部分的数据是在</strong>BODY<strong>部分，如果是</strong>GET**请求的话。那么BODY是空的。解析完成后根据解析过程中保存的相应信息，制作响应报文，通过集中写将资源文件和响应报文分别发送给客户端。</p>
+<h2 id="日志模块"><a href="#日志模块" class="headerlink" title="日志模块"></a>日志模块</h2><p>​    日志模块的初始化是先建立一个日志文件，通过一个变量按照天数去划分不同的日志文件。线程池采用RAII手法，在构造时创建线程，折构时唤醒所有睡眠的线程使其退出循环。IO复用是对epoll函数调用的一个封装。HTTP对象主要设置文件存放的相关路径。缓冲区和阻塞队列主要完成指定大小的参数设定</p>
+<h2 id="个人收获"><a href="#个人收获" class="headerlink" title="个人收获"></a>个人收获</h2><p>​    学习了基本的网络编程与多线程编程，并且对c++语法有了更新的了解，了解了常用的网络设计模式，并且对一个项目框架和模块的设计有了更深刻的理解。</p>
+<h2 id="网络设计模式"><a href="#网络设计模式" class="headerlink" title="网络设计模式"></a>网络设计模式</h2><h3 id="简单的说一下服务器使用的并发模型"><a href="#简单的说一下服务器使用的并发模型" class="headerlink" title="简单的说一下服务器使用的并发模型"></a>简单的说一下服务器使用的并发模型</h3><p>​    该项目采用的是单Reactor多线程模型，主线程负责监听文件描述符上是否有事件发生，如果有则立刻通知工作线程，将socket可读可写事件放入请求队列，读写数据均在工作线程中完成。</p>
+<h3 id="Reactor与Proactor的区别"><a href="#Reactor与Proactor的区别" class="headerlink" title="Reactor与Proactor的区别"></a>Reactor与Proactor的区别</h3><ul>
+<li>Reactor采用的是同步IO，多路复用监听事件，然后根据事件类型进行任务分发，让线程池处理。</li>
+<li>Proactor采用的是异步IO，主线程只负责发起I&#x2F;O操作，真正的IO实现由操作系统处理</li>
+</ul>
+<p><strong>无论是Reactor和Proactor都是基于事件分发的网络编程模式，区别在于Reactor是基于待完成的IO事件，Proactor是基于已完成的IO事件</strong></p>
+<h3 id="同步IO与异步IO的区别"><a href="#同步IO与异步IO的区别" class="headerlink" title="同步IO与异步IO的区别"></a>同步IO与异步IO的区别</h3><p>​    核心区别就是内核通知给用户空间的是就绪态还是完成态。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/09/TinyWebServer-9/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1300,98 +1423,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/26/QML-Component/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/touxiang.gif">
-      <meta itemprop="name" content="ZzBoAYU">
-      <meta itemprop="description" content="-珍惜眼前人-">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZzBoAYU HOME">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/06/26/QML-Component/" class="post-title-link" itemprop="url">QML-Component</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-06-26 18:23:16 / 修改时间：19:02:37" itemprop="dateCreated datePublished" datetime="2023-06-26T18:23:16+08:00">2023-06-26</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Qt/" itemprop="url" rel="index"><span itemprop="name">Qt</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>345</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="QML-Component详解"><a href="#QML-Component详解" class="headerlink" title="QML-Component详解"></a>QML-Component详解</h1><p>​    Component（组件）是Qt QML中的重要元素，用于定义可重用的QML元素，可以视作为自定义控件，要注意：</p>
-<ul>
-<li>Component只能包含一个顶层的Item或者实例，而且这个在Item之外不能定义除了id以外的任何数据</li>
-<li>Component通常用来给一个视图（ListView等）提供图形化组件</li>
-<li>Component不是Item的派生类，而是从QQmlComponent继承而来的，虽然它通过自己的顶层Item为其他的View提供可视化组件，但它本身不是可见元素</li>
-</ul>
-<p>​    下面是Component在视图中的一个应用</p>
-<figure class="highlight qml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">    <span class="title">ColumnLayout</span>&#123;</span><br><span class="line">        <span class="attribute">anchors.fill</span>: <span class="built_in">parent</span></span><br><span class="line">        <span class="title">Item</span>&#123;</span><br><span class="line">            <span class="attribute">Layout.fillWidth</span>: <span class="literal">true</span></span><br><span class="line">            <span class="attribute">Layout.preferredHeight</span>: <span class="number">150</span></span><br><span class="line">            <span class="title">MusicBorderImage</span>&#123;</span><br><span class="line">                <span class="attribute">anchors.centerIn</span>: <span class="built_in">parent</span></span><br><span class="line">                <span class="attribute">height</span>: <span class="number">100</span></span><br><span class="line">                <span class="attribute">width</span>: <span class="number">100</span></span><br><span class="line">                <span class="attribute">borderRadius</span>: <span class="number">100</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 列表菜单</span></span><br><span class="line">        <span class="title">ListView</span>&#123;</span><br><span class="line">            <span class="comment">//id: menuListView</span></span><br><span class="line">            <span class="attribute">id:</span><span class="string"> menuView</span></span><br><span class="line">            <span class="attribute">height</span>: <span class="built_in">parent</span>.height</span><br><span class="line">            <span class="attribute">Layout.fillHeight</span>: <span class="literal">true</span></span><br><span class="line">            <span class="attribute">Layout.fillWidth</span>: <span class="literal">true</span></span><br><span class="line">            <span class="attribute">model</span>: <span class="title">ListModel</span>&#123;</span><br><span class="line">                <span class="attribute">id:</span><span class="string"> menuViewModel</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="attribute">delegate</span>: menuViewDelegate</span><br><span class="line">            <span class="attribute">highlight</span>: <span class="title">Rectangle</span>&#123;</span><br><span class="line">                <span class="attribute">color</span>: <span class="string">&quot;#f1efed&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="attribute">highlightMoveDuration</span>: <span class="number">10</span>    <span class="comment">// 设置切换列表中的变形时间</span></span><br><span class="line">            <span class="attribute">highlightResizeDuration</span>: <span class="number">10</span>  <span class="comment">// 设置下拉列表的变形时间</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Component作为代理为ListView提供可视化组件</span></span><br><span class="line">    <span class="title">Component</span> &#123;</span><br><span class="line">        <span class="attribute">id:</span><span class="string"> menuViewDelegate</span></span><br><span class="line">        <span class="title">Rectangle</span>&#123;</span><br><span class="line">            <span class="attribute">id:</span><span class="string"> menuViewDelegateItem</span></span><br><span class="line">            <span class="attribute">width</span>: <span class="number">200</span></span><br><span class="line">            <span class="attribute">height</span>: <span class="number">50</span></span><br><span class="line">            <span class="attribute">color</span>: menuView.isCurrentItem?<span class="string">&quot;#f1efed&quot;</span>:<span class="string">&quot;#ffffff&quot;</span></span><br><span class="line">            <span class="title">RowLayout</span>&#123;</span><br><span class="line">                <span class="attribute">anchors.fill</span>: <span class="built_in">parent</span></span><br><span class="line">                <span class="attribute">anchors.centerIn</span>: <span class="built_in">parent</span></span><br><span class="line">                <span class="attribute">spacing</span>: <span class="number">15</span></span><br><span class="line">                <span class="title">Item</span>&#123;</span><br><span class="line">                   <span class="attribute">width</span>: <span class="number">30</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="title">Image</span>&#123;</span><br><span class="line">                    <span class="attribute">source</span>: <span class="string">&quot;qrc:/images/&quot;</span>+icon</span><br><span class="line">                    <span class="attribute">Layout.preferredHeight</span>: <span class="number">20</span></span><br><span class="line">                    <span class="attribute">Layout.preferredWidth</span>: <span class="number">20</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="title">Text</span>&#123;</span><br><span class="line">                    <span class="attribute">text</span>: value</span><br><span class="line">                    <span class="attribute">Layout.fillWidth</span>: <span class="literal">true</span></span><br><span class="line">                    <span class="attribute">height</span>: <span class="number">50</span></span><br><span class="line">                    <span class="attribute">font.family</span>: <span class="built_in">window</span>.mFONT_FAMILY</span><br><span class="line">                    <span class="attribute">font.pointSize</span>: <span class="number">12</span></span><br><span class="line">                    <span class="attribute">color</span>: <span class="string">&quot;#000000&quot;</span></span><br><span class="line">                &#125;</span><br><span class="line">         &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// onCompleted表示</span></span><br><span class="line">    <span class="attribute">Component.onCompleted</span>: &#123;</span><br><span class="line">        menuViewModel.append(qmlList.filter(item=&gt;item.menu))</span><br><span class="line">        <span class="keyword">var</span> loader = repeater.itemAt(defaultIndex)</span><br><span class="line">        loader.visible = <span class="literal">true</span></span><br><span class="line">        loader.source = qmlList[defaultIndex].qml + <span class="string">&quot;.qml&quot;</span></span><br><span class="line">        menuView.currentIndex = defaultIndex</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 作为一个嵌入式的Component必须用Loader来显示</span></span><br><span class="line"><span class="title">Repeater</span>&#123;  <span class="comment">// 重复构造</span></span><br><span class="line">    <span class="attribute">id:</span><span class="string"> repeater</span></span><br><span class="line">    <span class="attribute">model</span>: qmlList.length  <span class="comment">// filter过滤</span></span><br><span class="line">    <span class="title">Loader</span> &#123;</span><br><span class="line">       <span class="attribute">visible</span>: <span class="literal">false</span></span><br><span class="line">       <span class="attribute">Layout.fillWidth</span>: <span class="literal">true</span></span><br><span class="line">       <span class="attribute">Layout.fillHeight</span>: <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/default-index/page/2/">2</a><a class="extend next" rel="next" href="/default-index/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/default-index/page/2/">2</a><a class="page-number" href="/default-index/page/3/">3</a><a class="extend next" rel="next" href="/default-index/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1497,12 +1532,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">63k</span>
+    <span title="站点总字数">65k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">3:51</span>
+    <span title="站点阅读时长">3:57</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>

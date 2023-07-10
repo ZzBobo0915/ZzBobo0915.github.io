@@ -188,6 +188,94 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/26/QML-Component/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/touxiang.gif">
+      <meta itemprop="name" content="ZzBoAYU">
+      <meta itemprop="description" content="-珍惜眼前人-">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZzBoAYU HOME">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/06/26/QML-Component/" class="post-title-link" itemprop="url">QML-Component</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-06-26 18:23:16 / 修改时间：19:02:37" itemprop="dateCreated datePublished" datetime="2023-06-26T18:23:16+08:00">2023-06-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Qt/" itemprop="url" rel="index"><span itemprop="name">Qt</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>345</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="QML-Component详解"><a href="#QML-Component详解" class="headerlink" title="QML-Component详解"></a>QML-Component详解</h1><p>​    Component（组件）是Qt QML中的重要元素，用于定义可重用的QML元素，可以视作为自定义控件，要注意：</p>
+<ul>
+<li>Component只能包含一个顶层的Item或者实例，而且这个在Item之外不能定义除了id以外的任何数据</li>
+<li>Component通常用来给一个视图（ListView等）提供图形化组件</li>
+<li>Component不是Item的派生类，而是从QQmlComponent继承而来的，虽然它通过自己的顶层Item为其他的View提供可视化组件，但它本身不是可见元素</li>
+</ul>
+<p>​    下面是Component在视图中的一个应用</p>
+<figure class="highlight qml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">    <span class="title">ColumnLayout</span>&#123;</span><br><span class="line">        <span class="attribute">anchors.fill</span>: <span class="built_in">parent</span></span><br><span class="line">        <span class="title">Item</span>&#123;</span><br><span class="line">            <span class="attribute">Layout.fillWidth</span>: <span class="literal">true</span></span><br><span class="line">            <span class="attribute">Layout.preferredHeight</span>: <span class="number">150</span></span><br><span class="line">            <span class="title">MusicBorderImage</span>&#123;</span><br><span class="line">                <span class="attribute">anchors.centerIn</span>: <span class="built_in">parent</span></span><br><span class="line">                <span class="attribute">height</span>: <span class="number">100</span></span><br><span class="line">                <span class="attribute">width</span>: <span class="number">100</span></span><br><span class="line">                <span class="attribute">borderRadius</span>: <span class="number">100</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 列表菜单</span></span><br><span class="line">        <span class="title">ListView</span>&#123;</span><br><span class="line">            <span class="comment">//id: menuListView</span></span><br><span class="line">            <span class="attribute">id:</span><span class="string"> menuView</span></span><br><span class="line">            <span class="attribute">height</span>: <span class="built_in">parent</span>.height</span><br><span class="line">            <span class="attribute">Layout.fillHeight</span>: <span class="literal">true</span></span><br><span class="line">            <span class="attribute">Layout.fillWidth</span>: <span class="literal">true</span></span><br><span class="line">            <span class="attribute">model</span>: <span class="title">ListModel</span>&#123;</span><br><span class="line">                <span class="attribute">id:</span><span class="string"> menuViewModel</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="attribute">delegate</span>: menuViewDelegate</span><br><span class="line">            <span class="attribute">highlight</span>: <span class="title">Rectangle</span>&#123;</span><br><span class="line">                <span class="attribute">color</span>: <span class="string">&quot;#f1efed&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="attribute">highlightMoveDuration</span>: <span class="number">10</span>    <span class="comment">// 设置切换列表中的变形时间</span></span><br><span class="line">            <span class="attribute">highlightResizeDuration</span>: <span class="number">10</span>  <span class="comment">// 设置下拉列表的变形时间</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Component作为代理为ListView提供可视化组件</span></span><br><span class="line">    <span class="title">Component</span> &#123;</span><br><span class="line">        <span class="attribute">id:</span><span class="string"> menuViewDelegate</span></span><br><span class="line">        <span class="title">Rectangle</span>&#123;</span><br><span class="line">            <span class="attribute">id:</span><span class="string"> menuViewDelegateItem</span></span><br><span class="line">            <span class="attribute">width</span>: <span class="number">200</span></span><br><span class="line">            <span class="attribute">height</span>: <span class="number">50</span></span><br><span class="line">            <span class="attribute">color</span>: menuView.isCurrentItem?<span class="string">&quot;#f1efed&quot;</span>:<span class="string">&quot;#ffffff&quot;</span></span><br><span class="line">            <span class="title">RowLayout</span>&#123;</span><br><span class="line">                <span class="attribute">anchors.fill</span>: <span class="built_in">parent</span></span><br><span class="line">                <span class="attribute">anchors.centerIn</span>: <span class="built_in">parent</span></span><br><span class="line">                <span class="attribute">spacing</span>: <span class="number">15</span></span><br><span class="line">                <span class="title">Item</span>&#123;</span><br><span class="line">                   <span class="attribute">width</span>: <span class="number">30</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="title">Image</span>&#123;</span><br><span class="line">                    <span class="attribute">source</span>: <span class="string">&quot;qrc:/images/&quot;</span>+icon</span><br><span class="line">                    <span class="attribute">Layout.preferredHeight</span>: <span class="number">20</span></span><br><span class="line">                    <span class="attribute">Layout.preferredWidth</span>: <span class="number">20</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="title">Text</span>&#123;</span><br><span class="line">                    <span class="attribute">text</span>: value</span><br><span class="line">                    <span class="attribute">Layout.fillWidth</span>: <span class="literal">true</span></span><br><span class="line">                    <span class="attribute">height</span>: <span class="number">50</span></span><br><span class="line">                    <span class="attribute">font.family</span>: <span class="built_in">window</span>.mFONT_FAMILY</span><br><span class="line">                    <span class="attribute">font.pointSize</span>: <span class="number">12</span></span><br><span class="line">                    <span class="attribute">color</span>: <span class="string">&quot;#000000&quot;</span></span><br><span class="line">                &#125;</span><br><span class="line">         &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// onCompleted表示</span></span><br><span class="line">    <span class="attribute">Component.onCompleted</span>: &#123;</span><br><span class="line">        menuViewModel.append(qmlList.filter(item=&gt;item.menu))</span><br><span class="line">        <span class="keyword">var</span> loader = repeater.itemAt(defaultIndex)</span><br><span class="line">        loader.visible = <span class="literal">true</span></span><br><span class="line">        loader.source = qmlList[defaultIndex].qml + <span class="string">&quot;.qml&quot;</span></span><br><span class="line">        menuView.currentIndex = defaultIndex</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 作为一个嵌入式的Component必须用Loader来显示</span></span><br><span class="line"><span class="title">Repeater</span>&#123;  <span class="comment">// 重复构造</span></span><br><span class="line">    <span class="attribute">id:</span><span class="string"> repeater</span></span><br><span class="line">    <span class="attribute">model</span>: qmlList.length  <span class="comment">// filter过滤</span></span><br><span class="line">    <span class="title">Loader</span> &#123;</span><br><span class="line">       <span class="attribute">visible</span>: <span class="literal">false</span></span><br><span class="line">       <span class="attribute">Layout.fillWidth</span>: <span class="literal">true</span></span><br><span class="line">       <span class="attribute">Layout.fillHeight</span>: <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/06/01/Qt-socket/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1888,161 +1976,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/20/STL%E7%9F%A5%E8%AF%86%E7%82%B9/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/touxiang.gif">
-      <meta itemprop="name" content="ZzBoAYU">
-      <meta itemprop="description" content="-珍惜眼前人-">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZzBoAYU HOME">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/04/20/STL%E7%9F%A5%E8%AF%86%E7%82%B9/" class="post-title-link" itemprop="url">STL知识点</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-04-20 16:18:55 / 修改时间：20:00:47" itemprop="dateCreated datePublished" datetime="2023-04-20T16:18:55+08:00">2023-04-20</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>1.8k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>7 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="STL知识点"><a href="#STL知识点" class="headerlink" title="STL知识点"></a>STL知识点</h2><h3 id="STL序列式容器有哪些？"><a href="#STL序列式容器有哪些？" class="headerlink" title="STL序列式容器有哪些？"></a>STL序列式容器有哪些？</h3><ul>
-<li>array</li>
-<li>vector</li>
-<li>list</li>
-<li>deque</li>
-<li>forward_list</li>
-</ul>
-<h3 id="array底层原理"><a href="#array底层原理" class="headerlink" title="array底层原理"></a>array底层原理</h3><p>​    array本质就是一个<strong>大小固定的数组</strong>，无法动态改变，只允许访问或替换数组中的元素。</p>
-<h3 id="vector底层原理"><a href="#vector底层原理" class="headerlink" title="vector底层原理"></a>vector底层原理</h3><p>​    vector底层是一个<strong>动态数组</strong>，包含三个迭代器，start, finish, end_of_storage；当数组空间装不下时，会自动申请另一篇更大的空间（1.5倍或2倍），把原来的数据拷贝带新的内存空间，然后释放原来的那片空间。</p>
-<p>​    vector调用clear()函数只是清空了里面的数据，其存储空间不释放。</p>
-<h3 id="vector中reserver与resize"><a href="#vector中reserver与resize" class="headerlink" title="vector中reserver与resize"></a>vector中reserver与resize</h3><p>​    vector中reverse()是直接扩充到确定的大小下，可以减少多次开辟、释放空间的问题；resize()可以改变有效空间的大小，也有改变默认值的功能。</p>
-<h3 id="vector中size与capacity"><a href="#vector中size与capacity" class="headerlink" title="vector中size与capacity"></a>vector中size与capacity</h3><p>​    vector中size表示当前有多少元素，capacity表示当前分配的内存能容纳多少元素。</p>
-<h3 id="如何正确释放vector内存"><a href="#如何正确释放vector内存" class="headerlink" title="如何正确释放vector内存"></a>如何正确释放vector内存</h3><ul>
-<li>vec.clear(); vec.shrink_to_fit();  清空内容并且释放内存</li>
-<li>vector(Vec).swap(Vec); 清除内存</li>
-<li>vector().swap(Vec); 清除内存</li>
-</ul>
-<h3 id="list底层原理"><a href="#list底层原理" class="headerlink" title="list底层原理"></a>list底层原理</h3><p>​    list底层是一个<strong>双向链表</strong>，以节点为单位存储数据，节点的地址在内存中不一定连续，每次插入或者删除一个元素，就配置或释放一个元素空间。</p>
-<p>​    list不支持随机存取，适合需要大量的插入和删除，而不关心随机存取的应用场景。</p>
-<h3 id="deque底层原理"><a href="#deque底层原理" class="headerlink" title="deque底层原理"></a>deque底层原理</h3><p>​    deque底层是一个<strong>双向开口的线性连续空间（双端队列</strong>），在头部和尾部插入、删除元素有理想的复杂度；并且deque也不保证存储元素所有元素都存储在连续的空间内。</p>
-<h3 id="vector、list与deque都适用于什么情况？"><a href="#vector、list与deque都适用于什么情况？" class="headerlink" title="vector、list与deque都适用于什么情况？"></a>vector、list与deque都适用于什么情况？</h3><p>​    vector可以随机存储元素，不需要挨个查找，适合随机存取的场景使用，除非必要情况尽量都使用vecter而非deque；</p>
-<p>​    list适用于对象大、对象数量频繁变化，插入和删除频繁的场景；</p>
-<p>​    deque适合在头尾两端进行操作的场景。</p>
-<h3 id="forwrad-list底层原理"><a href="#forwrad-list底层原理" class="headerlink" title="forwrad_list底层原理"></a>forwrad_list底层原理</h3><p>​    froward_list和list差不多，只不过他是一个<strong>单向链表</strong>，节点的地址在内存中不一定连续。</p>
-<h3 id="STL关联容容器是什么？有哪些？"><a href="#STL关联容容器是什么？有哪些？" class="headerlink" title="STL关联容容器是什么？有哪些？"></a>STL关联容容器是什么？有哪些？</h3><p>​    关联式容器是指存储元素是会为元素配备一个键Key，整体以键值对的方式存储在容器中；另外，关联式容器在存储元素时会根据元素的大小进行排序(less&lt;T&gt;, greater&lt;T&gt;)。</p>
-<ul>
-<li>map</li>
-<li>multimap</li>
-<li>set</li>
-<li>multiset</li>
-</ul>
-<h3 id="上述几个关联式容器的的底层原理是什么？"><a href="#上述几个关联式容器的的底层原理是什么？" class="headerlink" title="上述几个关联式容器的的底层原理是什么？"></a>上述几个关联式容器的的底层原理是什么？</h3><p>​    关联式容器的底层都是根据<strong>红黑树</strong>实现的，epoll模型的低层也是红黑树。红黑树具有以下特点：</p>
-<ol>
-<li>是一个棵平衡二叉树</li>
-<li>节点分为两种颜色：红色和黑色</li>
-<li>根节点和叶子节点为黑色</li>
-<li>红色结点的子节点必须是黑色节点</li>
-<li>根节点到任意一个叶子节点的路径上黑色节点个数相同</li>
-</ol>
-<h3 id="map"><a href="#map" class="headerlink" title="map"></a>map</h3><p>​    map容器存储的都是pair对象（键值对），默认情况下会自定根据键的大小按照升序排序std::less&lt;T&gt;。map中存储的键不能重复也不能被修改（注意是键不能修改！值可以）。</p>
-<h3 id="multimap"><a href="#multimap" class="headerlink" title="multimap"></a>multimap</h3><p>​    multimap与map一样按照键值对存储，不相同的是multimap可以存入多个相同键的键值对。</p>
-<h3 id="set"><a href="#set" class="headerlink" title="set"></a>set</h3><p>​    与两个map容器不同，使用set容器存储的各个键值对的key和value都相等。set还要求存储的键不能重复，并且默认情况下也会根据键的大小按升序排序。</p>
-<h3 id="multeset"><a href="#multeset" class="headerlink" title="multeset"></a>multeset</h3><p>​     multiset与set一样按照键值对存储key和value都相等，不同的是multiset可以存入多个相同的键值对。</p>
-<h3 id="map和set的插入删除速度是多少？为什么每次insert之后以前保存的iterator不会失效？"><a href="#map和set的插入删除速度是多少？为什么每次insert之后以前保存的iterator不会失效？" class="headerlink" title="map和set的插入删除速度是多少？为什么每次insert之后以前保存的iterator不会失效？"></a>map和set的插入删除速度是多少？为什么每次insert之后以前保存的iterator不会失效？</h3><p>​    map和set的插入删除速度都是logN。</p>
-<p>​    由于红黑树存储的是节点，不需要内存拷贝和内存移动，插入和删除操作也只是将节点的指针换来换去，节点内存没有改变。</p>
-<h3 id="为何map和set不能像vector一样有个reserve函数来预分配数据"><a href="#为何map和set不能像vector一样有个reserve函数来预分配数据" class="headerlink" title="为何map和set不能像vector一样有个reserve函数来预分配数据?"></a>为何map和set不能像vector一样有个reserve函数来预分配数据?</h3><p>​    因为在map和set内部存储的已经不是元素本身了，而是包含元素的结点。也就是说map内部使用的Alloc并不是map&lt;Key, Data, Compare, Alloc&gt;声明的时候从参数中传入的Alloc。</p>
-<h3 id="map的插入方式有几种？"><a href="#map的插入方式有几种？" class="headerlink" title="map的插入方式有几种？"></a>map的插入方式有几种？</h3><ul>
-<li>用insert插入pair数据 <code>mapM.insert(pair&lt;char, int&gt;(&#39;a&#39;, 1));</code></li>
-<li>用insert插入value_type数据 <code>mapM.insert(map&lt;char, int&gt;::value_type(&#39;a&#39;, 1));</code></li>
-<li>在insert函数中使用make_pair()函数 <code>mapM.insert(make_pair(&#39;a&#39;, 1));</code></li>
-<li>用数组下标方式插入 <code>mapM[&#39;a&#39;] = 1;</code></li>
-</ul>
-<h3 id="STL无序式关联容器有哪些？"><a href="#STL无序式关联容器有哪些？" class="headerlink" title="STL无序式关联容器有哪些？"></a>STL无序式关联容器有哪些？</h3><p>​    无序式关联容器，又称哈希容器，采用的存储结构为哈希表。<strong>哈希表可以根据关键字直接找到数据的存储位置，不需要进行任何比较，大大降低数据查找和存储消耗的时间，但是需要比较多的内存。</strong></p>
-<ul>
-<li>unordered_map</li>
-<li>unordered_set    </li>
-<li>unordered_multimap</li>
-<li>unordered_multiset</li>
-</ul>
-<h3 id="unordered-map底层原理、unordered-set底层原理"><a href="#unordered-map底层原理、unordered-set底层原理" class="headerlink" title="unordered_map底层原理、unordered_set底层原理"></a>unordered_map底层原理、unordered_set底层原理</h3><p>​    unordered_map的底层是一个防冗余的哈希表（采用除留余数法），还是采用键值对的方式存储，键值对互不相等并且不会对存储内容进行排序。</p>
-<p> unordered_set低层也是一个防冗余的哈希表，不以键值对存储，直接存储数据的值，元素值互不相同并且不会对内容进行排序。</p>
-<p>​    使用一个下标范围较大的数组来存储元素，设计一个哈希函数(散列函数)，使得每一个元素的key都与一个函数值(数组下表，hash值)相对应，用这个数组单元来存储这个元素，这个数组单元也被成为桶。</p>
-<p>​    对于不同元素计算出相同哈希值(即发生冲突)的时候，一般采用开链法解决冲突。</p>
-<h3 id="STL的容器适配器有哪些？"><a href="#STL的容器适配器有哪些？" class="headerlink" title="STL的容器适配器有哪些？"></a>STL的容器适配器有哪些？</h3><p>​    容器适配器是一个封装了序列容器的模板。</p>
-<ul>
-<li>stack</li>
-<li>queue</li>
-<li>priority_queue</li>
-</ul>
-<h3 id="stack底层原理"><a href="#stack底层原理" class="headerlink" title="stack底层原理"></a>stack底层原理</h3><p>​    stack适配器是一个<strong>单端开口的容器</strong>，模拟栈存储结构，无论存数据还是读数据，都只能从这个一个开口操作。满足后进先出LIFO准则。</p>
-<h3 id="queue底层原理"><a href="#queue底层原理" class="headerlink" title="queue底层原理"></a>queue底层原理</h3><p>​    queue适配器有<strong>两个开口的容器，一个专门输入数据，一个专门输出数据</strong>，模拟单向队列存储结构。满足先入先出FIFO准则。</p>
-<h3 id="priority-queue底层原理"><a href="#priority-queue底层原理" class="headerlink" title="priority_queue底层原理"></a>priority_queue底层原理</h3><p>​    priority_queue适配器模拟的也是队列这种存储结构，只能一端进，另一段出，且每次访问只能访问队头元素，本质是一个堆，又被称为优先队列(最大堆&#x2F;最小堆)，队头元素永远都是优先级最大的元素。可以在创建优先队列对象时指明是最大堆less&lt;T&gt;还是最小堆greater&lt;T&gt;，这里less与greater与其他容器不同，priority_queue默认最大堆。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/default-index/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/default-index/">1</a><span class="page-number current">2</span>
+    <a class="extend prev" rel="prev" href="/default-index/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/default-index/">1</a><span class="page-number current">2</span><a class="page-number" href="/default-index/page/3/">3</a><a class="extend next" rel="next" href="/default-index/page/3/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -2148,12 +2085,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">63k</span>
+    <span title="站点总字数">65k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">3:51</span>
+    <span title="站点阅读时长">3:57</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
