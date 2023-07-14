@@ -188,6 +188,117 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/20/hexo%E7%BD%91%E7%AB%99/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/touxiang.gif">
+      <meta itemprop="name" content="ZzBoAYU">
+      <meta itemprop="description" content="-珍惜眼前人-">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZzBoAYU HOME">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/04/20/hexo%E7%BD%91%E7%AB%99/" class="post-title-link" itemprop="url">Hexo搭建自己的网站</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-04-20 16:41:52 / 修改时间：18:06:21" itemprop="dateCreated datePublished" datetime="2023-04-20T16:41:52+08:00">2023-04-20</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>853</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>  <strong>Hexo是一个快读、简洁高效的博客框架，使用Markdown解析文章</strong></p>
+<h3 id="1-在安装hexo前我们必须要安装Node和Git：-有的就直接第2步"><a href="#1-在安装hexo前我们必须要安装Node和Git：-有的就直接第2步" class="headerlink" title="1.在安装hexo前我们必须要安装Node和Git：(有的就直接第2步)"></a>1.在安装hexo前我们必须要安装Node和Git：(有的就直接第2步)</h3><ul>
+<li><p>Git官方下载地址：<a target="_blank" rel="noopener" href="https://git-scm.com/download/win">https://git-scm.com/download/win</a></p>
+<p>  下载完在cmd输入 <code>git --version</code> 查看Git版本并确认是否安装成功 </p>
+<p>  （若未出现可能是环境变量未配置，去环境变量配置一下就行）</p>
+</li>
+<li><p>Node.js官网下载地址：<a target="_blank" rel="noopener" href="https://nodejs.org/en">https://nodejs.org/en</a></p>
+<p>  下载完在cmd输入 <code>node -v</code> 查看Node版本并确认是否安装成功</p>
+</li>
+</ul>
+<h2 id="2-安装Hexo"><a href="#2-安装Hexo" class="headerlink" title="2.安装Hexo"></a>2.安装Hexo</h2><p><code>npm install -g hexo-cli</code></p>
+<h2 id="3-配置github"><a href="#3-配置github" class="headerlink" title="3.配置github"></a>3.配置github</h2><h3 id="3-1创建github仓库"><a href="#3-1创建github仓库" class="headerlink" title="3.1创建github仓库"></a>3.1创建github仓库</h3><p>首先你需要创建一个github账户（略）</p>
+<p>  创建完账户需要新建一个名为: <code>username.github.io</code>的仓库， <code>username</code>为你的github用户名，并且这个仓库有且只能有唯一一个，这样就可以通过访问 <code>https://username.github.io</code>来访问你的仓库。</p>
+<h3 id="3-2配置SSH免密登录"><a href="#3-2配置SSH免密登录" class="headerlink" title="3.2配置SSH免密登录"></a>3.2配置SSH免密登录</h3><ol>
+<li>首先打开首先打开电脑文件夹，找到 C:\Users\你的用户名\ .ssh文件夹并删除(如果没有，则直接进入第二步)</li>
+<li>在 C:\Users\你的用户名 文件夹下右键打开 Git Bash Here 输入命令: <code>ssh-keygen -t rsa -C &quot;你的github登录邮箱&quot;</code> 生成.ssh秘钥，输入后连敲三次回车，出一个框里面一堆字符情况代表成功</li>
+<li>生成了一个新的 C:\Users\你的用户名\ .ssh文件夹，打开这个文件夹，找到 .ssh\id_rsa.pub 文件，记事本打开并复制里面的内容</li>
+<li>打开您的 github 主页，进入个人设置 -&gt; SSH and GPG keys -&gt; New SSH key，把复制的内容粘贴进去，title 随便填，保存即可，我们的公钥就添加成功了</li>
+<li>输入命令: <code>ssh -T git@github.com</code>，会给你返回以下内容：<code>Hi 你的Github username!You&#39;ve successfully authenticated, but GitHub does not provide shell access.   </code>说明配置成功</li>
+</ol>
+<p>此外你还需要配置以下内容</p>
+<p><code>git config --global user.name &quot;你的 Github username&quot;</code>  你的github的username</p>
+<p><code>git config --global user.email &quot;xxx@qq.com&quot;</code>  你的github邮箱</p>
+<h2 id="4-使用Hexo搭建博客"><a href="#4-使用Hexo搭建博客" class="headerlink" title="4.使用Hexo搭建博客"></a>4.使用Hexo搭建博客</h2><h3 id="4-1进行hexo初始化"><a href="#4-1进行hexo初始化" class="headerlink" title="4.1进行hexo初始化"></a>4.1进行hexo初始化</h3><ol>
+<li>在电脑的某个磁盘或路径创建一个文件夹（名字随便取），我这里取得是D:\blog，由于这个文件夹作为将来存放代码的地方，所以一定要好好记住。</li>
+<li>打开这个文件夹，在文件夹右键打开GIt Base Here，如果没有就在显示更多选项中寻找，输入命令 <code>hexo init</code> 进行初始化：hexo会下载一些文件和文件夹</li>
+<li>在D:\blog这个文件夹中执行 <code>hexo g</code> 会在public文件夹下生相关的html文件</li>
+<li>在D:\blog这个文件夹中执行 <code>hexo s</code> 会开启本地预览，打开浏览器访问<a href="http://localhost:4000即可看到博客内容">http://localhost:4000即可看到博客内容</a></li>
+</ol>
+<h3 id="4-2部署至github"><a href="#4-2部署至github" class="headerlink" title="4.2部署至github"></a>4.2部署至github</h3><ol>
+<li><p>还在D:\blog这个文件夹中，执行<code>npm install hexo-deployer-git --save</code>命令</p>
+</li>
+<li><p>编辑D:\blog中的<code>_config.yml</code>文件，在文件末尾处添加以下内容</p>
+ <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line">   <span class="attr">type:</span> <span class="string">git</span></span><br><span class="line">   <span class="attr">repository:</span> <span class="string">git@github.com:ZzBobo0915/ZzBobo0915.github.io.git</span></span><br><span class="line">   <span class="attr">brance:</span> <span class="string">main</span></span><br></pre></td></tr></table></figure>
+
+<p> 其中<code>repository</code>中的内容是你的github项目的SSH链接地址</p>
+</li>
+<li><p>在D:\blog这个文件夹中，执行<code>hexo d</code>将本地项目推送到github远程仓库，有可能要需要输入用户名和密码</p>
+<p> 推送成功后，即可通过仓库名<code>zzbobo0915.github.io/</code>访问个人博客了</p>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/20/STL%E7%9F%A5%E8%AF%86%E7%82%B9/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -444,12 +555,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">65k</span>
+    <span title="站点总字数">66k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">3:58</span>
+    <span title="站点阅读时长">3:59</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
