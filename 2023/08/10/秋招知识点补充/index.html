@@ -21,19 +21,19 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":300,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":false,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":null,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":"Trebuchet","preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="Hexo是一个快读、简洁高效的博客框架，使用Markdown解析文章 1.在安装hexo前我们必须要安装Node和Git：(有的就直接第2步) Git官方下载地址：https:&#x2F;&#x2F;git-scm.com&#x2F;download&#x2F;win   下载完在cmd输入 git --version 查看Git版本并确认是否安装成功    （若未出现可能是环境变量未配置，去环境变量配置一下就行）  Node.js">
+  <meta name="description" content="秋招知识点补充对秋招过程中发现的问题与学习的新知识进行总结！ 端口号是什么？​    端口号可以用来标识同一个主机上通信的不同应用程序，端口号+ip就可以组成一个套接字，用来标识一个进程：  0-1023：知名端号，一般用于协议 1024-65535：操作系统动态分派的端口号  ​    在linux中通过 cat &#x2F;etc&#x2F;services 来查看知名端口号。 一个进程可以bind多个端口号么？">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hexo搭建自己的网站">
-<meta property="og:url" content="http://example.com/2023/04/20/hexo%E7%BD%91%E7%AB%99/index.html">
+<meta property="og:title" content="秋招知识点补充">
+<meta property="og:url" content="http://example.com/2023/08/10/%E7%A7%8B%E6%8B%9B%E7%9F%A5%E8%AF%86%E7%82%B9%E8%A1%A5%E5%85%85/index.html">
 <meta property="og:site_name" content="ZzBoAYU HOME">
-<meta property="og:description" content="Hexo是一个快读、简洁高效的博客框架，使用Markdown解析文章 1.在安装hexo前我们必须要安装Node和Git：(有的就直接第2步) Git官方下载地址：https:&#x2F;&#x2F;git-scm.com&#x2F;download&#x2F;win   下载完在cmd输入 git --version 查看Git版本并确认是否安装成功    （若未出现可能是环境变量未配置，去环境变量配置一下就行）  Node.js">
+<meta property="og:description" content="秋招知识点补充对秋招过程中发现的问题与学习的新知识进行总结！ 端口号是什么？​    端口号可以用来标识同一个主机上通信的不同应用程序，端口号+ip就可以组成一个套接字，用来标识一个进程：  0-1023：知名端号，一般用于协议 1024-65535：操作系统动态分派的端口号  ​    在linux中通过 cat &#x2F;etc&#x2F;services 来查看知名端口号。 一个进程可以bind多个端口号么？">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-04-20T08:41:52.000Z">
-<meta property="article:modified_time" content="2023-04-20T10:06:21.566Z">
+<meta property="article:published_time" content="2023-08-10T07:35:46.000Z">
+<meta property="article:modified_time" content="2023-09-10T15:50:52.938Z">
 <meta property="article:author" content="ZzBoAYU">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/2023/04/20/hexo%E7%BD%91%E7%AB%99/">
+<link rel="canonical" href="http://example.com/2023/08/10/%E7%A7%8B%E6%8B%9B%E7%9F%A5%E8%AF%86%E7%82%B9%E8%A1%A5%E5%85%85/">
 
 
 <script id="page-configurations">
@@ -46,7 +46,7 @@
   };
 </script>
 
-  <title>Hexo搭建自己的网站 | ZzBoAYU HOME</title>
+  <title>秋招知识点补充 | ZzBoAYU HOME</title>
   
 
 
@@ -191,7 +191,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/04/20/hexo%E7%BD%91%E7%AB%99/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/10/%E7%A7%8B%E6%8B%9B%E7%9F%A5%E8%AF%86%E7%82%B9%E8%A1%A5%E5%85%85/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/touxiang.gif">
@@ -204,7 +204,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Hexo搭建自己的网站
+          秋招知识点补充
         </h1>
 
         <div class="post-meta">
@@ -213,9 +213,24 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2023-04-20 16:41:52 / 修改时间：18:06:21" itemprop="dateCreated datePublished" datetime="2023-04-20T16:41:52+08:00">2023-04-20</time>
+              <time title="创建时间：2023-08-10 15:35:46" itemprop="dateCreated datePublished" datetime="2023-08-10T15:35:46+08:00">2023-08-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-09-10 23:50:52" itemprop="dateModified" datetime="2023-09-10T23:50:52+08:00">2023-09-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
             </span>
 
           
@@ -230,13 +245,13 @@
               <span class="post-meta-item-icon">
                 <i class="far fa-file-word"></i>
               </span>
-              <span>853</span>
+              <span>1.2k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
-              <span>3 分钟</span>
+              <span>4 分钟</span>
             </span>
 
         </div>
@@ -248,46 +263,45 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>  <strong>Hexo是一个快读、简洁高效的博客框架，使用Markdown解析文章</strong></p>
-<h3 id="1-在安装hexo前我们必须要安装Node和Git：-有的就直接第2步"><a href="#1-在安装hexo前我们必须要安装Node和Git：-有的就直接第2步" class="headerlink" title="1.在安装hexo前我们必须要安装Node和Git：(有的就直接第2步)"></a>1.在安装hexo前我们必须要安装Node和Git：(有的就直接第2步)</h3><ul>
-<li><p>Git官方下载地址：<a target="_blank" rel="noopener" href="https://git-scm.com/download/win">https://git-scm.com/download/win</a></p>
-<p>  下载完在cmd输入 <code>git --version</code> 查看Git版本并确认是否安装成功 </p>
-<p>  （若未出现可能是环境变量未配置，去环境变量配置一下就行）</p>
-</li>
-<li><p>Node.js官网下载地址：<a target="_blank" rel="noopener" href="https://nodejs.org/en">https://nodejs.org/en</a></p>
-<p>  下载完在cmd输入 <code>node -v</code> 查看Node版本并确认是否安装成功</p>
+        <h1 id="秋招知识点补充"><a href="#秋招知识点补充" class="headerlink" title="秋招知识点补充"></a>秋招知识点补充</h1><p>对秋招过程中发现的问题与学习的新知识进行总结！</p>
+<h3 id="端口号是什么？"><a href="#端口号是什么？" class="headerlink" title="端口号是什么？"></a>端口号是什么？</h3><p>​    端口号可以用来标识同一个主机上通信的不同应用程序，端口号+ip就可以组成一个套接字，用来标识一个进程：</p>
+<ul>
+<li>0-1023：知名端号，一般用于协议</li>
+<li>1024-65535：操作系统动态分派的端口号</li>
+</ul>
+<p>​    在linux中通过 <code>cat /etc/services</code> 来查看知名端口号。</p>
+<h3 id="一个进程可以bind多个端口号么？"><a href="#一个进程可以bind多个端口号么？" class="headerlink" title="一个进程可以bind多个端口号么？"></a>一个进程可以bind多个端口号么？</h3><p>​    可以。因为一个进程可以打开多个文件描述符，而每个文件描述符都对应一个端口号</p>
+<h3 id="一个端口可以绑定多个进程么？"><a href="#一个端口可以绑定多个进程么？" class="headerlink" title="一个端口可以绑定多个进程么？"></a>一个端口可以绑定多个进程么？</h3><p>​    通常情况下是不可以的，但有一种情况可以：如果父进程先绑定一个端口号，然后fork一个子进程，那么这样的话子进程是可以绑定父进程的端口号，但是同时只能有一个进程执行bind；在支持SO_REUSEPORT的内核中，支持同uid的进程绑定同一个端口号，多个进程可以随便bind函数绑定同一个端口；在支持SO_REUSEADDR的内核中允许重复绑定，但是只用于UDP的多播。</p>
+<h3 id="SO-REUSEADDR的作用"><a href="#SO-REUSEADDR的作用" class="headerlink" title="SO_REUSEADDR的作用"></a>SO_REUSEADDR的作用</h3><p>以下内容摘自《Unix网络编程》卷一，即UNPv1</p>
+<ul>
+<li>当有一个有相同本地地址和端口的socket1处于TIME_WAIT状态时，而你启动的程序的socket2要占用该地址和端口，你的程序就要用到该选项。（这个是tcp专用的）</li>
+<li>SO_REUSEADDR允许同一port上启动同一服务器的多个实例(多个进程)。但每个实例绑定的IP地址是不能相同的。在有多块网卡或用IP Alias技术的机器可以测试这种情况。</li>
+<li>SO_REUSEADDR允许单个进程绑定相同的端口到多个<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=socket&spm=1001.2101.3001.7020">socket</a>上，但每个socket绑定的ip地址不同。这和2很相似，区别请看UNPv1。（这里我在linux下试验了，下，要求一个的ip不能是0.0.0.0）</li>
+<li>SO_REUSEADDR允许完全相同的地址和端口的重复绑定。但这只用于UDP的多播，不用于TCP。</li>
+</ul>
+<h3 id="大端存储与小端存储"><a href="#大端存储与小端存储" class="headerlink" title="大端存储与小端存储"></a>大端存储与小端存储</h3><p>​    大端和小端是两种不同的字节序，本质的区别就是高字节与低字节的存储顺序不同。大端字节序为高字节在低地址，低字节在高地址；而小端字节序为高字节在高地址，低字节在低地址；取决于计算机的硬件。</p>
+<p>​    可以通过联合体或强转来判断计算机的存储方式：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">union</span>&#123;</span></span><br><span class="line">        <span class="type">short</span> s;</span><br><span class="line">        <span class="type">char</span> c;</span><br><span class="line">    &#125;un;</span><br><span class="line">    un.s = <span class="number">0x0102</span>;</span><br><span class="line">    <span class="keyword">if</span> (un.c == <span class="number">0x01</span>)</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Big Endian\n&quot;</span>);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (un.c == <span class="number">0x02</span>)</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Littile Endian\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="为什么不淘汰select呐？"><a href="#为什么不淘汰select呐？" class="headerlink" title="为什么不淘汰select呐？"></a>为什么不淘汰select呐？</h3><ol>
+<li>可移植性：select在每个支持网络和非阻塞套接字的平台都会支持select，但是他可能不支持poll</li>
+<li>select的超时时间理论上可以精确到纳秒，而poll和epoll的精度只有微秒，对于桌面或者服务器系统来说没什么区别，但是对于某些硬件嵌入式平台来说还可能是需要这种量级的。</li>
+</ol>
+<h3 id="纯虚函数和抽象类"><a href="#纯虚函数和抽象类" class="headerlink" title="纯虚函数和抽象类"></a>纯虚函数和抽象类</h3><ul>
+<li>纯虚函数是指在一个基类中只声明而没有定义的虚函数，要求子类必须对其进行重写，可以使用纯虚函数来模拟实现接口</li>
+<li>一个具有纯虚函数的类被称为抽象类<ol>
+<li>抽象类对象不能做函数参数，不能创建对象，不能作为函数返回类型</li>
+<li>可以声明抽象类指针与抽象类引用</li>
+<li>子类必须重写父类的纯虚函数才能创建对象</li>
+</ol>
 </li>
 </ul>
-<h2 id="2-安装Hexo"><a href="#2-安装Hexo" class="headerlink" title="2.安装Hexo"></a>2.安装Hexo</h2><p><code>npm install -g hexo-cli</code></p>
-<h2 id="3-配置github"><a href="#3-配置github" class="headerlink" title="3.配置github"></a>3.配置github</h2><h3 id="3-1创建github仓库"><a href="#3-1创建github仓库" class="headerlink" title="3.1创建github仓库"></a>3.1创建github仓库</h3><p>首先你需要创建一个github账户（略）</p>
-<p>  创建完账户需要新建一个名为: <code>username.github.io</code>的仓库， <code>username</code>为你的github用户名，并且这个仓库有且只能有唯一一个，这样就可以通过访问 <code>https://username.github.io</code>来访问你的仓库。</p>
-<h3 id="3-2配置SSH免密登录"><a href="#3-2配置SSH免密登录" class="headerlink" title="3.2配置SSH免密登录"></a>3.2配置SSH免密登录</h3><ol>
-<li>首先打开首先打开电脑文件夹，找到 C:\Users\你的用户名\ .ssh文件夹并删除(如果没有，则直接进入第二步)</li>
-<li>在 C:\Users\你的用户名 文件夹下右键打开 Git Bash Here 输入命令: <code>ssh-keygen -t rsa -C &quot;你的github登录邮箱&quot;</code> 生成.ssh秘钥，输入后连敲三次回车，出一个框里面一堆字符情况代表成功</li>
-<li>生成了一个新的 C:\Users\你的用户名\ .ssh文件夹，打开这个文件夹，找到 .ssh\id_rsa.pub 文件，记事本打开并复制里面的内容</li>
-<li>打开您的 github 主页，进入个人设置 -&gt; SSH and GPG keys -&gt; New SSH key，把复制的内容粘贴进去，title 随便填，保存即可，我们的公钥就添加成功了</li>
-<li>输入命令: <code>ssh -T git@github.com</code>，会给你返回以下内容：<code>Hi 你的Github username!You&#39;ve successfully authenticated, but GitHub does not provide shell access.   </code>说明配置成功</li>
-</ol>
-<p>此外你还需要配置以下内容</p>
-<p><code>git config --global user.name &quot;你的 Github username&quot;</code>  你的github的username</p>
-<p><code>git config --global user.email &quot;xxx@qq.com&quot;</code>  你的github邮箱</p>
-<h2 id="4-使用Hexo搭建博客"><a href="#4-使用Hexo搭建博客" class="headerlink" title="4.使用Hexo搭建博客"></a>4.使用Hexo搭建博客</h2><h3 id="4-1进行hexo初始化"><a href="#4-1进行hexo初始化" class="headerlink" title="4.1进行hexo初始化"></a>4.1进行hexo初始化</h3><ol>
-<li>在电脑的某个磁盘或路径创建一个文件夹（名字随便取），我这里取得是D:\blog，由于这个文件夹作为将来存放代码的地方，所以一定要好好记住。</li>
-<li>打开这个文件夹，在文件夹右键打开GIt Base Here，如果没有就在显示更多选项中寻找，输入命令 <code>hexo init</code> 进行初始化：hexo会下载一些文件和文件夹</li>
-<li>在D:\blog这个文件夹中执行 <code>hexo g</code> 会在public文件夹下生相关的html文件</li>
-<li>在D:\blog这个文件夹中执行 <code>hexo s</code> 会开启本地预览，打开浏览器访问<a href="http://localhost:4000即可看到博客内容">http://localhost:4000即可看到博客内容</a></li>
-</ol>
-<h3 id="4-2部署至github"><a href="#4-2部署至github" class="headerlink" title="4.2部署至github"></a>4.2部署至github</h3><ol>
-<li><p>还在D:\blog这个文件夹中，执行<code>npm install hexo-deployer-git --save</code>命令</p>
-</li>
-<li><p>编辑D:\blog中的<code>_config.yml</code>文件，在文件末尾处添加以下内容</p>
- <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line">   <span class="attr">type:</span> <span class="string">git</span></span><br><span class="line">   <span class="attr">repository:</span> <span class="string">git@github.com:ZzBobo0915/ZzBobo0915.github.io.git</span></span><br><span class="line">   <span class="attr">brance:</span> <span class="string">main</span></span><br></pre></td></tr></table></figure>
-
-<p> 其中<code>repository</code>中的内容是你的github项目的SSH链接地址</p>
-</li>
-<li><p>在D:\blog这个文件夹中，执行<code>hexo d</code>将本地项目推送到github远程仓库，有可能要需要输入用户名和密码</p>
-<p> 推送成功后，即可通过仓库名<code>zzbobo0915.github.io/</code>访问个人博客了</p>
-</li>
+<h3 id="什么函数不能被声明为虚函数"><a href="#什么函数不能被声明为虚函数" class="headerlink" title="什么函数不能被声明为虚函数"></a>什么函数不能被声明为虚函数</h3><ol>
+<li>非类的成员函数：虚函数是依托类的，脱离类是不存在虚函数的</li>
+<li>构造函数：虚函数指针是在构造函数中初始化的，如果构造函数为虚函数则创建不了虚函数指针，互相矛盾</li>
+<li>内联函数：内敛函数为静态编译，是在编译期间直接展开的，而虚函数本意是动态编译，是在运行时期进行编译确定，二者冲突</li>
+<li>静态函数：静态函数的调用无法传递传递this指针，但是虚函数的调用需要调用this指针，来找到虚函数表，互相矛盾</li>
+<li>友元函数：C++不支持友元函数的继承，不能继承的函数肯定不是虚函数</li>
 </ol>
 
     </div>
@@ -304,13 +318,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2023/04/20/STL%E7%9F%A5%E8%AF%86%E7%82%B9/" rel="prev" title="STL知识点">
-      <i class="fa fa-chevron-left"></i> STL知识点
+    <a href="/2023/07/14/%E5%B0%8F%E7%BA%A2%E4%B9%A6c-%E5%AE%9E%E4%B9%A0%E4%B8%80%E9%9D%A2/" rel="prev" title="小红书c++实习一面">
+      <i class="fa fa-chevron-left"></i> 小红书c++实习一面
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2023/04/20/knowledge-summarize/" rel="next" title="暑期实习知识点总结">
-      暑期实习知识点总结 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -369,7 +380,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%9C%A8%E5%AE%89%E8%A3%85hexo%E5%89%8D%E6%88%91%E4%BB%AC%E5%BF%85%E9%A1%BB%E8%A6%81%E5%AE%89%E8%A3%85Node%E5%92%8CGit%EF%BC%9A-%E6%9C%89%E7%9A%84%E5%B0%B1%E7%9B%B4%E6%8E%A5%E7%AC%AC2%E6%AD%A5"><span class="nav-number">1.</span> <span class="nav-text">1.在安装hexo前我们必须要安装Node和Git：(有的就直接第2步)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%AE%89%E8%A3%85Hexo"><span class="nav-number"></span> <span class="nav-text">2.安装Hexo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E9%85%8D%E7%BD%AEgithub"><span class="nav-number"></span> <span class="nav-text">3.配置github</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1%E5%88%9B%E5%BB%BAgithub%E4%BB%93%E5%BA%93"><span class="nav-number">1.</span> <span class="nav-text">3.1创建github仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2%E9%85%8D%E7%BD%AESSH%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95"><span class="nav-number">2.</span> <span class="nav-text">3.2配置SSH免密登录</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E4%BD%BF%E7%94%A8Hexo%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2"><span class="nav-number"></span> <span class="nav-text">4.使用Hexo搭建博客</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1%E8%BF%9B%E8%A1%8Chexo%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">1.</span> <span class="nav-text">4.1进行hexo初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2%E9%83%A8%E7%BD%B2%E8%87%B3github"><span class="nav-number">2.</span> <span class="nav-text">4.2部署至github</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A7%8B%E6%8B%9B%E7%9F%A5%E8%AF%86%E7%82%B9%E8%A1%A5%E5%85%85"><span class="nav-number">1.</span> <span class="nav-text">秋招知识点补充</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E5%8F%B7%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">1.0.1.</span> <span class="nav-text">端口号是什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E8%BF%9B%E7%A8%8B%E5%8F%AF%E4%BB%A5bind%E5%A4%9A%E4%B8%AA%E7%AB%AF%E5%8F%A3%E5%8F%B7%E4%B9%88%EF%BC%9F"><span class="nav-number">1.0.2.</span> <span class="nav-text">一个进程可以bind多个端口号么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E7%AB%AF%E5%8F%A3%E5%8F%AF%E4%BB%A5%E7%BB%91%E5%AE%9A%E5%A4%9A%E4%B8%AA%E8%BF%9B%E7%A8%8B%E4%B9%88%EF%BC%9F"><span class="nav-number">1.0.3.</span> <span class="nav-text">一个端口可以绑定多个进程么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SO-REUSEADDR%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">1.0.4.</span> <span class="nav-text">SO_REUSEADDR的作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%A7%E7%AB%AF%E5%AD%98%E5%82%A8%E4%B8%8E%E5%B0%8F%E7%AB%AF%E5%AD%98%E5%82%A8"><span class="nav-number">1.0.5.</span> <span class="nav-text">大端存储与小端存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E6%B7%98%E6%B1%B0select%E5%91%90%EF%BC%9F"><span class="nav-number">1.0.6.</span> <span class="nav-text">为什么不淘汰select呐？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%AF%E8%99%9A%E5%87%BD%E6%95%B0%E5%92%8C%E6%8A%BD%E8%B1%A1%E7%B1%BB"><span class="nav-number">1.0.7.</span> <span class="nav-text">纯虚函数和抽象类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E5%87%BD%E6%95%B0%E4%B8%8D%E8%83%BD%E8%A2%AB%E5%A3%B0%E6%98%8E%E4%B8%BA%E8%99%9A%E5%87%BD%E6%95%B0"><span class="nav-number">1.0.8.</span> <span class="nav-text">什么函数不能被声明为虚函数</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

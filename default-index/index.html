@@ -188,6 +188,131 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/10/%E7%A7%8B%E6%8B%9B%E7%9F%A5%E8%AF%86%E7%82%B9%E8%A1%A5%E5%85%85/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/touxiang.gif">
+      <meta itemprop="name" content="ZzBoAYU">
+      <meta itemprop="description" content="-珍惜眼前人-">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ZzBoAYU HOME">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/08/10/%E7%A7%8B%E6%8B%9B%E7%9F%A5%E8%AF%86%E7%82%B9%E8%A1%A5%E5%85%85/" class="post-title-link" itemprop="url">秋招知识点补充</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-10 15:35:46" itemprop="dateCreated datePublished" datetime="2023-08-10T15:35:46+08:00">2023-08-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-09-10 23:50:52" itemprop="dateModified" datetime="2023-09-10T23:50:52+08:00">2023-09-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Cpp/" itemprop="url" rel="index"><span itemprop="name">Cpp</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+              <span>1.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="秋招知识点补充"><a href="#秋招知识点补充" class="headerlink" title="秋招知识点补充"></a>秋招知识点补充</h1><p>对秋招过程中发现的问题与学习的新知识进行总结！</p>
+<h3 id="端口号是什么？"><a href="#端口号是什么？" class="headerlink" title="端口号是什么？"></a>端口号是什么？</h3><p>​    端口号可以用来标识同一个主机上通信的不同应用程序，端口号+ip就可以组成一个套接字，用来标识一个进程：</p>
+<ul>
+<li>0-1023：知名端号，一般用于协议</li>
+<li>1024-65535：操作系统动态分派的端口号</li>
+</ul>
+<p>​    在linux中通过 <code>cat /etc/services</code> 来查看知名端口号。</p>
+<h3 id="一个进程可以bind多个端口号么？"><a href="#一个进程可以bind多个端口号么？" class="headerlink" title="一个进程可以bind多个端口号么？"></a>一个进程可以bind多个端口号么？</h3><p>​    可以。因为一个进程可以打开多个文件描述符，而每个文件描述符都对应一个端口号</p>
+<h3 id="一个端口可以绑定多个进程么？"><a href="#一个端口可以绑定多个进程么？" class="headerlink" title="一个端口可以绑定多个进程么？"></a>一个端口可以绑定多个进程么？</h3><p>​    通常情况下是不可以的，但有一种情况可以：如果父进程先绑定一个端口号，然后fork一个子进程，那么这样的话子进程是可以绑定父进程的端口号，但是同时只能有一个进程执行bind；在支持SO_REUSEPORT的内核中，支持同uid的进程绑定同一个端口号，多个进程可以随便bind函数绑定同一个端口；在支持SO_REUSEADDR的内核中允许重复绑定，但是只用于UDP的多播。</p>
+<h3 id="SO-REUSEADDR的作用"><a href="#SO-REUSEADDR的作用" class="headerlink" title="SO_REUSEADDR的作用"></a>SO_REUSEADDR的作用</h3><p>以下内容摘自《Unix网络编程》卷一，即UNPv1</p>
+<ul>
+<li>当有一个有相同本地地址和端口的socket1处于TIME_WAIT状态时，而你启动的程序的socket2要占用该地址和端口，你的程序就要用到该选项。（这个是tcp专用的）</li>
+<li>SO_REUSEADDR允许同一port上启动同一服务器的多个实例(多个进程)。但每个实例绑定的IP地址是不能相同的。在有多块网卡或用IP Alias技术的机器可以测试这种情况。</li>
+<li>SO_REUSEADDR允许单个进程绑定相同的端口到多个<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=socket&spm=1001.2101.3001.7020">socket</a>上，但每个socket绑定的ip地址不同。这和2很相似，区别请看UNPv1。（这里我在linux下试验了，下，要求一个的ip不能是0.0.0.0）</li>
+<li>SO_REUSEADDR允许完全相同的地址和端口的重复绑定。但这只用于UDP的多播，不用于TCP。</li>
+</ul>
+<h3 id="大端存储与小端存储"><a href="#大端存储与小端存储" class="headerlink" title="大端存储与小端存储"></a>大端存储与小端存储</h3><p>​    大端和小端是两种不同的字节序，本质的区别就是高字节与低字节的存储顺序不同。大端字节序为高字节在低地址，低字节在高地址；而小端字节序为高字节在高地址，低字节在低地址；取决于计算机的硬件。</p>
+<p>​    可以通过联合体或强转来判断计算机的存储方式：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">union</span>&#123;</span></span><br><span class="line">        <span class="type">short</span> s;</span><br><span class="line">        <span class="type">char</span> c;</span><br><span class="line">    &#125;un;</span><br><span class="line">    un.s = <span class="number">0x0102</span>;</span><br><span class="line">    <span class="keyword">if</span> (un.c == <span class="number">0x01</span>)</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Big Endian\n&quot;</span>);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (un.c == <span class="number">0x02</span>)</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Littile Endian\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="为什么不淘汰select呐？"><a href="#为什么不淘汰select呐？" class="headerlink" title="为什么不淘汰select呐？"></a>为什么不淘汰select呐？</h3><ol>
+<li>可移植性：select在每个支持网络和非阻塞套接字的平台都会支持select，但是他可能不支持poll</li>
+<li>select的超时时间理论上可以精确到纳秒，而poll和epoll的精度只有微秒，对于桌面或者服务器系统来说没什么区别，但是对于某些硬件嵌入式平台来说还可能是需要这种量级的。</li>
+</ol>
+<h3 id="纯虚函数和抽象类"><a href="#纯虚函数和抽象类" class="headerlink" title="纯虚函数和抽象类"></a>纯虚函数和抽象类</h3><ul>
+<li>纯虚函数是指在一个基类中只声明而没有定义的虚函数，要求子类必须对其进行重写，可以使用纯虚函数来模拟实现接口</li>
+<li>一个具有纯虚函数的类被称为抽象类<ol>
+<li>抽象类对象不能做函数参数，不能创建对象，不能作为函数返回类型</li>
+<li>可以声明抽象类指针与抽象类引用</li>
+<li>子类必须重写父类的纯虚函数才能创建对象</li>
+</ol>
+</li>
+</ul>
+<h3 id="什么函数不能被声明为虚函数"><a href="#什么函数不能被声明为虚函数" class="headerlink" title="什么函数不能被声明为虚函数"></a>什么函数不能被声明为虚函数</h3><ol>
+<li>非类的成员函数：虚函数是依托类的，脱离类是不存在虚函数的</li>
+<li>构造函数：虚函数指针是在构造函数中初始化的，如果构造函数为虚函数则创建不了虚函数指针，互相矛盾</li>
+<li>内联函数：内敛函数为静态编译，是在编译期间直接展开的，而虚函数本意是动态编译，是在运行时期进行编译确定，二者冲突</li>
+<li>静态函数：静态函数的调用无法传递传递this指针，但是虚函数的调用需要调用this指针，来找到虚函数表，互相矛盾</li>
+<li>友元函数：C++不支持友元函数的继承，不能继承的函数肯定不是虚函数</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/14/%E5%B0%8F%E7%BA%A2%E4%B9%A6c-%E5%AE%9E%E4%B9%A0%E4%B8%80%E9%9D%A2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1291,128 +1416,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/07/03/TinyWebServer-2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/touxiang.gif">
-      <meta itemprop="name" content="ZzBoAYU">
-      <meta itemprop="description" content="-珍惜眼前人-">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ZzBoAYU HOME">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/07/03/TinyWebServer-2/" class="post-title-link" itemprop="url">TinyWebServer-2</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2023-07-03 14:26:47 / 修改时间：18:33:56" itemprop="dateCreated datePublished" datetime="2023-07-03T14:26:47+08:00">2023-07-03</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/WebServer/" itemprop="url" rel="index"><span itemprop="name">WebServer</span></a>
-                </span>
-            </span>
-
-          
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-              <span>2k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-              <span>7 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="从零开始实现C-TinyWebServer-②"><a href="#从零开始实现C-TinyWebServer-②" class="headerlink" title="从零开始实现C++TinyWebServer-②"></a>从零开始实现C++TinyWebServer-②</h1><p>​    关于Buffer实质是参考了陈硕大佬的muduo库中的buffer应用，下面的内容大部分取自陈硕大佬的原话，详见：<a target="_blank" rel="noopener" href="https://github.com/chenshuo/muduo">https://github.com/chenshuo/muduo</a> 和 <a target="_blank" rel="noopener" href="https://blog.csdn.net/Solstice/article/details/6329080">https://blog.csdn.net/Solstice/article/details/6329080</a></p>
-<hr>
-<p>​    非阻塞I&#x2F;O的思想是避免阻塞在read()或write()等需要I&#x2F;O系统调用上，让一个线程等服务于多个socket连接，I&#x2F;O线程只能阻塞在I&#x2F;O多路复用函数上，如select&#x2F;poll&#x2F;epoll上，这样一来应用层的缓冲是必须有的。每个TCP scoket都要有有状态的inout buffr与output buffer。</p>
-<p>​    <strong>要想程序在write操作上不阻塞，网络库必须要给每个TCP连接配置output buffer:</strong></p>
-<ul>
-<li>例如程序发送了100kb的数据，然而操作系统只能接受80kb，你肯定不想原地等待，因为不知道要等多久，程序应该尽快的交出控制权，返回event loop；对于应用程序而言，它并不关心数据是怎么发送的，它只管生成数据，这些应该有网络库管理，程序只管调用send()就行，网络库接管这剩下的20kb数据；这种情况下读缓冲区的必须的，把这20kb的数据保存到缓冲区的output buffer中，然后注册epollout事件，一旦socket可写就发送数据，如果还有剩余就重复以上操作，直到无数据可发送；</li>
-<li>如果20kb没有发完又来了30kb，那么这30kb应该append到20kb后面，等待可写时一并写入；</li>
-<li>如果缓冲区还有数据，但是程序想关闭连接，那么这时候网络库不能立刻关闭连接，而是要等到数据发送完毕再关闭，也就是后面会提到的<strong>“优雅关闭”</strong>。</li>
-</ul>
-<p>​    <strong>要想程序在read操作上不阻塞，网络库必须要给每个TCP连接配置input buffer:</strong></p>
-<ul>
-<li>TCP是一个无边界的字节流协议，接收方会经常碰到“收到的数据构不成一条完整的消息”、“一次收到两条消息的数据”等情况；当网络库处理socket可读事件时，必须一次性把socket里的数据读完（从操作系统buffer搬到应用层buffer），否则会反复出发POLLIN事件，那么对于“数据不完整”的情况，收到的数据通常是先放在input buffer中，等构成一条完整的消息时再通知程序的业务逻辑；这种情况下写缓冲区的必须的。</li>
-</ul>
-<h2 id="Buffer类"><a href="#Buffer类" class="headerlink" title="Buffer类"></a>Buffer类</h2><p>​    缓冲区类，设计源自moduo库：</p>
-<ul>
-<li>对外的接口为 <code>ReadFd(int fd, int* Errno)</code> 与 <code>WriteFd(int fd, int* Errno)</code></li>
-<li>往buffer写时是writeIndex移动</li>
-<li>从buffer读时是readIndex移动</li>
-<li>外部写入fd时是将buffer中的readable写入fd</li>
-<li>外部读取fd时是读取到writeable的位置</li>
-<li>有一个prependabel空间，让程序能以很低的代价在数据<strong>前面</strong>添加几个字节</li>
-<li><code>prependable = readIndex</code></li>
-<li><code>readable = writeIndex-readIndex</code></li>
-<li><code>writeable = size()-writeIndex</code></li>
-</ul>
-<img src="/2023/07/03/TinyWebServer-2/Buffer%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84.gif" class="" title="Buffer的数据结构">
-
-<p>​    <strong>ps:补充一下基础， <code>size_t</code>是无符号整型，在32位系统上长度为4个字节，64位长度位8个字节；<code>ssize_t</code>为有符号整型，32位系统上等同于int，64位等同于long int；一般采用ssize_t来表示可以被执行读写操作的数据块的大小。</strong></p>
-<h2 id="实现与代码"><a href="#实现与代码" class="headerlink" title="实现与代码"></a>实现与代码</h2><p>​    <strong>WebServer中，客户端连接发来的Http请求(放到conn的读缓冲区)以及回复给客户端的响应报文(放在conn的写缓冲区)，都需要通过缓冲区来进行；以vector容器作为底层实体，封装一些方法用来实现自己的buffer缓冲区，满足读写需要。</strong></p>
-<h3 id="ivoec结构体的使用"><a href="#ivoec结构体的使用" class="headerlink" title="ivoec结构体的使用"></a>ivoec结构体的使用</h3><p> iovec定义了一个向量元素，这个结构体用于一个多元素的数组，每一个元素的 <code>iov_base</code> 指向一个缓冲区，这个缓冲区存放的是网络接收的数据(read)或网络将要发送的数据(write)。<code>iov_len</code> 存放接收数据的最大长度或者写入数据的实际长度：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">iovec</span>&#123;</span></span><br><span class="line">    <span class="type">void</span> iov_base;</span><br><span class="line">    <span class="type">size_t</span> iov_len;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>​    在linux中，使用iovec的结构体变量作为参数的函数很多，比如：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/uio.h&gt;</span></span></span><br><span class="line"><span class="comment">// iovcnt表示iovec数组的大小</span></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">readv</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="keyword">struct</span> iovec* iov, <span class="type">int</span> iovcnt)</span>;</span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">writev</span><span class="params">(<span class="type">int</span>, fd, <span class="type">const</span> <span class="keyword">struct</span> iovec* iov, <span class="type">int</span> iovcnt)</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="具体代码"><a href="#具体代码" class="headerlink" title="具体代码"></a>具体代码</h3><p><strong>buffer.h</strong></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * @Author  : Zhu Zhibo</span></span><br><span class="line"><span class="comment"> * @Data    : 2023/07/03</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> BUFFER_NEW_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BUFFER_NEW_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cstring&gt;</span>  <span class="comment">// perror</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span> <span class="comment">// write</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/uio.h&gt;</span> <span class="comment">// readv</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;atomic&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;assert.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Buffer</span> &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">	<span class="built_in">Buffer</span>(<span class="type">int</span> initBufferSize = <span class="number">1024</span>);</span><br><span class="line">	~<span class="built_in">Buffer</span>() = <span class="keyword">default</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 返回三段区域可用的大小</span></span><br><span class="line">	<span class="function"><span class="type">size_t</span> <span class="title">WritableBytes</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line">	<span class="function"><span class="type">size_t</span> <span class="title">ReadableBytes</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line">	<span class="function"><span class="type">size_t</span> <span class="title">PrependableBytes</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">Peek</span><span class="params">()</span> <span class="type">const</span></span>;  <span class="comment">// 获取读指针</span></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">EnsureWritable</span><span class="params">(<span class="type">size_t</span> len)</span></span>;  <span class="comment">// 确保可写长度</span></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">HasWritten</span><span class="params">(<span class="type">size_t</span> len)</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 读取len数据</span></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">Retrieve</span><span class="params">(<span class="type">size_t</span> len)</span></span>;</span><br><span class="line">	<span class="comment">// 读取到end位置</span></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">RetrieveUntil</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* end)</span></span>;</span><br><span class="line">	<span class="comment">// 取出所有数据</span></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">RetrieveAll</span><span class="params">()</span></span>; </span><br><span class="line">	<span class="comment">// 取出剩余所有数据</span></span><br><span class="line">	<span class="function">std::string <span class="title">RetrieveAllToStr</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 写指针位置</span></span><br><span class="line">	<span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">BeginWriteConst</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line">	<span class="function"><span class="type">char</span>* <span class="title">BeginWrite</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 添加到缓冲区中</span></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">Append</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* str, <span class="type">size_t</span> len)</span></span>;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">Append</span><span class="params">(<span class="type">const</span> std::string&amp; str)</span></span>;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">Append</span><span class="params">(<span class="type">const</span> <span class="type">void</span>* data, <span class="type">size_t</span> len)</span></span>;</span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">Append</span><span class="params">(<span class="type">const</span> Buffer&amp; buff)</span></span>;  <span class="comment">// 将读下表位置添加到写下标</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// httpconn中调用的读写接口</span></span><br><span class="line">	<span class="function"><span class="type">ssize_t</span> <span class="title">ReadFd</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span>* Errno)</span></span>;</span><br><span class="line">	<span class="function"><span class="type">sszie_t</span> <span class="title">WriteFd</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span>* Errno)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">	<span class="comment">// buffer的开头</span></span><br><span class="line">	<span class="function"><span class="type">char</span>* <span class="title">BeginPtr_</span><span class="params">()</span></span>;  </span><br><span class="line">	<span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">BeginPtr_</span><span class="params">()</span> <span class="type">const</span></span>;</span><br><span class="line">	<span class="comment">// 扩展空间</span></span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">MakeSpace_</span><span class="params">(<span class="type">size_t</span> len)</span></span>;  </span><br><span class="line"></span><br><span class="line">	std::vector&lt;<span class="type">char</span>&gt; buffer_;  <span class="comment">// buffer缓冲区的存储实体</span></span><br><span class="line">	std::atomic&lt;std::<span class="type">size_t</span>&gt; readPos_;  <span class="comment">// 读的下标，即readIndex</span></span><br><span class="line">	std::atomic&lt;std::<span class="type">size_t</span>&gt; writePos_;  <span class="comment">// 写的下表，即writeIndex</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span> <span class="comment">// !BUFFER_NEW_H</span></span></span><br></pre></td></tr></table></figure>
-
-<p><strong>buffer.cpp</strong></p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * @Author  : Zhu Zhibo</span></span><br><span class="line"><span class="comment"> * @Data    : 2023/07/03</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;buffer_new.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 构造函数初始化</span></span><br><span class="line">Buffer::<span class="built_in">Buffer</span>(<span class="type">int</span> initBufferSize) : <span class="built_in">buffer_</span>(initBufferSize), <span class="built_in">readPos_</span>(<span class="number">0</span>), <span class="built_in">writePos_</span>(<span class="number">0</span>) &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// writeable长度</span></span><br><span class="line"><span class="function"><span class="type">size_t</span> <span class="title">Buffer::WritableBytes</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> buffer_.<span class="built_in">size</span>() - writePos_;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// readable长度</span></span><br><span class="line"><span class="function"><span class="type">size_t</span> <span class="title">Buffer::ReadableBytes</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> writePos_ - readPos_;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 预留空间prependable的长度</span></span><br><span class="line"><span class="function"><span class="type">size_t</span> <span class="title">Buffer::PrependableBytes</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> readPos_;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取读指针</span></span><br><span class="line"><span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">Buffer::Peek</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;buffer_[readPos];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 确保可写长度</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::EnsureWritable</span><span class="params">(<span class="type">size_t</span> len)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// 判断可写长度是否够用，不够用则扩充</span></span><br><span class="line">	<span class="keyword">if</span> (len &gt; <span class="built_in">WritableBytes</span>()) <span class="built_in">MakeSpace_</span>(len);</span><br><span class="line">	<span class="built_in">assert</span>(len &lt;= <span class="built_in">WritableBytes</span>());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 移动写下标，在Append中使用</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::HasWritten</span><span class="params">(<span class="type">size_t</span> len)</span> </span>&#123;</span><br><span class="line">	writePos_ += len;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 读取len数据</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::Retrieve</span><span class="params">(<span class="type">size_t</span> len)</span> </span>&#123;</span><br><span class="line">	readPos_ += len;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 读取到end位置</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::RetrieveUntil</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* end)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">assert</span>(<span class="built_in">Peek</span>() &lt;= end);</span><br><span class="line">	<span class="built_in">Retrieve</span>(end - <span class="built_in">Peek</span>());  <span class="comment">// 长度=end指针-读指针</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 去除所有数据后的操作</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::RetrieveAll</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="built_in">bzero</span>(&amp;buffer_[<span class="number">0</span>], buffer_.<span class="built_in">size</span>());  <span class="comment">// 覆盖原有数据(清空数据)</span></span><br><span class="line">	readPos_ = writePos_ = <span class="number">0</span>;  <span class="comment">// 位置归0</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 读取剩余可读的str</span></span><br><span class="line"><span class="function">std::string <span class="title">Buffer::RetrieveAllToStr</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="function">std::string <span class="title">str</span><span class="params">(Peek(), ReadableBytes())</span></span>;</span><br><span class="line">	<span class="built_in">RetrieveAll</span>();  <span class="comment">// 读取完后清空</span></span><br><span class="line">	<span class="keyword">return</span> str;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">Buffer::BeginWriteConst</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;buffer_[writePos_];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">char</span>* <span class="title">Buffer::BeginWrite</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;buffer_[writePos_];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 添加字符串到缓冲区</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::Append</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* str, <span class="type">size_t</span> len)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">assert</span>(str);</span><br><span class="line">	<span class="built_in">EnsureWritable</span>(len);  <span class="comment">// 确保可写长度</span></span><br><span class="line">	std::<span class="built_in">copy</span>(str, str + len, <span class="built_in">BeginWrite</span>());  <span class="comment">// 将str放到写下标开始的地方</span></span><br><span class="line">	<span class="built_in">HasWritten</span>(len);  <span class="comment">// 移动写下标</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//下面三个调用上面的Append(cosnt char*,size_t)</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::Append</span><span class="params">(<span class="type">const</span> std::string&amp; str)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">Append</span>(str.<span class="built_in">c_str</span>(), str.<span class="built_in">length</span>());</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::Append</span><span class="params">(<span class="type">const</span> <span class="type">void</span>* data, <span class="type">size_t</span> len)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">Append</span>(<span class="built_in">static_cast</span>&lt;<span class="type">const</span> <span class="type">char</span>*&gt;(data), len);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//将buff中读下标的位置放在写当前buffer的写下标开始位置</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::Append</span><span class="params">(<span class="type">const</span> Buffer&amp; buff)</span> </span>&#123;</span><br><span class="line">	<span class="built_in">Append</span>(buff.<span class="built_in">Peek</span>(), buff.<span class="built_in">ReadableBytes</span>());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 读接口：</span></span><br><span class="line"><span class="function"><span class="type">ssize_t</span> <span class="title">Buffer::ReadFd</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span>* Errno)</span> </span>&#123;</span><br><span class="line">	<span class="type">char</span> buff[<span class="number">65535</span>];  <span class="comment">// 栈区</span></span><br><span class="line">	<span class="keyword">struct</span> <span class="title class_">iovec</span> iov[<span class="number">2</span>];  <span class="comment">// 缓冲区</span></span><br><span class="line">	<span class="type">const</span> <span class="type">size_t</span> writable = <span class="built_in">WritableBytes</span>();</span><br><span class="line">	<span class="comment">// 分散读，保证数据全部读完</span></span><br><span class="line">	iov[<span class="number">0</span>].iov_base = <span class="built_in">BeginWrite</span>();</span><br><span class="line">	iov[<span class="number">0</span>].iov_len = writable;</span><br><span class="line">	iov[<span class="number">1</span>].iov_base = buff;</span><br><span class="line">	iov[<span class="number">1</span>].iov_len = <span class="built_in">sizeof</span>(buff);</span><br><span class="line"></span><br><span class="line">	<span class="type">ssize_t</span> len = <span class="built_in">readv</span>(fd, iov, <span class="number">2</span>);</span><br><span class="line">	<span class="keyword">if</span> (len &lt; <span class="number">0</span>) &#123;</span><br><span class="line">		*Errno = errno;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 小于说明写区可以容纳len</span></span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">static_cast</span>&lt;<span class="type">size_t</span>&gt;(len) &lt;= writable) &#123;</span><br><span class="line">		writePos_ += len;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 写区满了，下标移动到最后</span></span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		writePos_ = buffer_.<span class="built_in">size</span>();</span><br><span class="line">		<span class="built_in">Append</span>(buff, <span class="built_in">static_cast</span>&lt;<span class="type">size_t</span>&gt;(len - writable));</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> len;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 写接口：</span></span><br><span class="line"><span class="function"><span class="type">sszie_t</span> <span class="title">Buffer::WriteFd</span><span class="params">(<span class="type">int</span> fd, <span class="type">int</span>* Errno)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// write(int handle, void *buf, int nbyte);</span></span><br><span class="line">	<span class="type">ssize_t</span> len = <span class="built_in">write</span>(fd, <span class="built_in">Peek</span>(), <span class="built_in">ReadableBytes</span>());</span><br><span class="line">	<span class="keyword">if</span> (len &lt; <span class="number">0</span>) &#123;</span><br><span class="line">		*Errno = errno;</span><br><span class="line">		<span class="keyword">return</span> len;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">Retrieve</span>(len);</span><br><span class="line">	<span class="keyword">return</span> len;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">char</span>* <span class="title">Buffer::BeginPtr_</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;buffer_[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">const</span> <span class="type">char</span>* <span class="title">Buffer::BeginPtr_</span><span class="params">()</span> <span class="type">const</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;buffer_[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 扩展空间</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Buffer::MakeSpace_</span><span class="params">(<span class="type">size_t</span> len)</span> </span>&#123;</span><br><span class="line">	<span class="comment">// len大于当前buffer_空间，直接扩充buffer_</span></span><br><span class="line">	<span class="keyword">if</span> (<span class="built_in">WritableBytes</span>() + <span class="built_in">PrependableBytes</span>() &lt; len) &#123;</span><br><span class="line">		buffer_.<span class="built_in">resize</span>(writePos_ + len + <span class="number">1</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 若小于等于，则将readPos_到writePos_数据拷贝至最前面</span></span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="type">size_t</span> readable = <span class="built_in">ReadableBytes</span>();</span><br><span class="line">		srd::<span class="built_in">copy</span>(<span class="built_in">BeginPtr_</span>() + readPos_, <span class="built_in">BeginPtr_</span>() + writePos_, <span class="built_in">BeginPtr_</span>());</span><br><span class="line">		readPos_ = <span class="number">0</span>;</span><br><span class="line">		writePos_ = readable;</span><br><span class="line">		<span class="built_in">asserr</span>(readable == ReadableBytes);</span><br><span class="line">	&#125;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
-
-<p>​    外部使用的主要接口为<code>ReadFd</code>与 <code>WriteFd</code>，调用这两个接口进行I&#x2F;O的读写操作，这两个接口直接调用read()&#x2F;write()、readv()&#x2F;writev()来实现。</p>
-<p>​    至此Buffer类的所有内容就都完成啦！</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1522,12 +1525,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">66k</span>
+    <span title="站点总字数">67k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">3:59</span>
+    <span title="站点阅读时长">4:04</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>

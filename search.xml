@@ -446,7 +446,9 @@
 <li>new与delete直接带具体数据类型，malloc和free返回void类型的指针</li>
 <li>new类型是安全的，malloc不是</li>
 <li>new调用构造函数，malloc不能；delete调用析构函数，free不能</li>
-<li>malloc&#x2F;free需要库文件stdlib.h支持，new&#x2F;delete则不需要</li>
+<li>malloc&#x2F;free是C&#x2F;C++的库函数，而new&#x2F;delete是C++的运算符，可以重载</li>
+<li>new是从自由存储区分配内存，而malloc是从堆分配的</li>
+<li>new申请空间失败会抛出bad_alloc异常，而malloc会返回NULL</li>
 </ul>
 <p>​    <strong>ps：delete和free调用后，内存不会立刻回收，指针也不会指空，释放完内存应该让指针指向NULL。并且new与delete本质也是封装了malloc与free的函数。</strong></p>
 <h3 id="delete与delete-的区别？"><a href="#delete与delete-的区别？" class="headerlink" title="delete与delete []的区别？"></a>delete与delete []的区别？</h3><ul>
@@ -2517,6 +2519,54 @@
 ]]></content>
       <categories>
         <category>面经</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>秋招知识点补充</title>
+    <url>/2023/08/10/%E7%A7%8B%E6%8B%9B%E7%9F%A5%E8%AF%86%E7%82%B9%E8%A1%A5%E5%85%85/</url>
+    <content><![CDATA[<h1 id="秋招知识点补充"><a href="#秋招知识点补充" class="headerlink" title="秋招知识点补充"></a>秋招知识点补充</h1><p>对秋招过程中发现的问题与学习的新知识进行总结！</p>
+<h3 id="端口号是什么？"><a href="#端口号是什么？" class="headerlink" title="端口号是什么？"></a>端口号是什么？</h3><p>​    端口号可以用来标识同一个主机上通信的不同应用程序，端口号+ip就可以组成一个套接字，用来标识一个进程：</p>
+<ul>
+<li>0-1023：知名端号，一般用于协议</li>
+<li>1024-65535：操作系统动态分派的端口号</li>
+</ul>
+<p>​    在linux中通过 <code>cat /etc/services</code> 来查看知名端口号。</p>
+<h3 id="一个进程可以bind多个端口号么？"><a href="#一个进程可以bind多个端口号么？" class="headerlink" title="一个进程可以bind多个端口号么？"></a>一个进程可以bind多个端口号么？</h3><p>​    可以。因为一个进程可以打开多个文件描述符，而每个文件描述符都对应一个端口号</p>
+<h3 id="一个端口可以绑定多个进程么？"><a href="#一个端口可以绑定多个进程么？" class="headerlink" title="一个端口可以绑定多个进程么？"></a>一个端口可以绑定多个进程么？</h3><p>​    通常情况下是不可以的，但有一种情况可以：如果父进程先绑定一个端口号，然后fork一个子进程，那么这样的话子进程是可以绑定父进程的端口号，但是同时只能有一个进程执行bind；在支持SO_REUSEPORT的内核中，支持同uid的进程绑定同一个端口号，多个进程可以随便bind函数绑定同一个端口；在支持SO_REUSEADDR的内核中允许重复绑定，但是只用于UDP的多播。</p>
+<h3 id="SO-REUSEADDR的作用"><a href="#SO-REUSEADDR的作用" class="headerlink" title="SO_REUSEADDR的作用"></a>SO_REUSEADDR的作用</h3><p>以下内容摘自《Unix网络编程》卷一，即UNPv1</p>
+<ul>
+<li>当有一个有相同本地地址和端口的socket1处于TIME_WAIT状态时，而你启动的程序的socket2要占用该地址和端口，你的程序就要用到该选项。（这个是tcp专用的）</li>
+<li>SO_REUSEADDR允许同一port上启动同一服务器的多个实例(多个进程)。但每个实例绑定的IP地址是不能相同的。在有多块网卡或用IP Alias技术的机器可以测试这种情况。</li>
+<li>SO_REUSEADDR允许单个进程绑定相同的端口到多个<a href="https://so.csdn.net/so/search?q=socket&spm=1001.2101.3001.7020">socket</a>上，但每个socket绑定的ip地址不同。这和2很相似，区别请看UNPv1。（这里我在linux下试验了，下，要求一个的ip不能是0.0.0.0）</li>
+<li>SO_REUSEADDR允许完全相同的地址和端口的重复绑定。但这只用于UDP的多播，不用于TCP。</li>
+</ul>
+<h3 id="大端存储与小端存储"><a href="#大端存储与小端存储" class="headerlink" title="大端存储与小端存储"></a>大端存储与小端存储</h3><p>​    大端和小端是两种不同的字节序，本质的区别就是高字节与低字节的存储顺序不同。大端字节序为高字节在低地址，低字节在高地址；而小端字节序为高字节在高地址，低字节在低地址；取决于计算机的硬件。</p>
+<p>​    可以通过联合体或强转来判断计算机的存储方式：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">union</span>&#123;</span></span><br><span class="line">        <span class="type">short</span> s;</span><br><span class="line">        <span class="type">char</span> c;</span><br><span class="line">    &#125;un;</span><br><span class="line">    un.s = <span class="number">0x0102</span>;</span><br><span class="line">    <span class="keyword">if</span> (un.c == <span class="number">0x01</span>)</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Big Endian\n&quot;</span>);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (un.c == <span class="number">0x02</span>)</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Littile Endian\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="为什么不淘汰select呐？"><a href="#为什么不淘汰select呐？" class="headerlink" title="为什么不淘汰select呐？"></a>为什么不淘汰select呐？</h3><ol>
+<li>可移植性：select在每个支持网络和非阻塞套接字的平台都会支持select，但是他可能不支持poll</li>
+<li>select的超时时间理论上可以精确到纳秒，而poll和epoll的精度只有微秒，对于桌面或者服务器系统来说没什么区别，但是对于某些硬件嵌入式平台来说还可能是需要这种量级的。</li>
+</ol>
+<h3 id="纯虚函数和抽象类"><a href="#纯虚函数和抽象类" class="headerlink" title="纯虚函数和抽象类"></a>纯虚函数和抽象类</h3><ul>
+<li>纯虚函数是指在一个基类中只声明而没有定义的虚函数，要求子类必须对其进行重写，可以使用纯虚函数来模拟实现接口</li>
+<li>一个具有纯虚函数的类被称为抽象类<ol>
+<li>抽象类对象不能做函数参数，不能创建对象，不能作为函数返回类型</li>
+<li>可以声明抽象类指针与抽象类引用</li>
+<li>子类必须重写父类的纯虚函数才能创建对象</li>
+</ol>
+</li>
+</ul>
+<h3 id="什么函数不能被声明为虚函数"><a href="#什么函数不能被声明为虚函数" class="headerlink" title="什么函数不能被声明为虚函数"></a>什么函数不能被声明为虚函数</h3><ol>
+<li>非类的成员函数：虚函数是依托类的，脱离类是不存在虚函数的</li>
+<li>构造函数：虚函数指针是在构造函数中初始化的，如果构造函数为虚函数则创建不了虚函数指针，互相矛盾</li>
+<li>内联函数：内敛函数为静态编译，是在编译期间直接展开的，而虚函数本意是动态编译，是在运行时期进行编译确定，二者冲突</li>
+<li>静态函数：静态函数的调用无法传递传递this指针，但是虚函数的调用需要调用this指针，来找到虚函数表，互相矛盾</li>
+<li>友元函数：C++不支持友元函数的继承，不能继承的函数肯定不是虚函数</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Cpp</category>
       </categories>
   </entry>
 </search>
