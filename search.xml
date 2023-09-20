@@ -2608,4 +2608,49 @@
         <category>Cpp</category>
       </categories>
   </entry>
+  <entry>
+    <title>中移苏小研C++一面</title>
+    <url>/2023/09/20/%E4%B8%AD%E7%A7%BB%E8%8B%8F%E5%B0%8F%E7%A0%94C-%E4%B8%80%E9%9D%A2/</url>
+    <content><![CDATA[<h1 id="中移苏小研C-x2F-C-一面"><a href="#中移苏小研C-x2F-C-一面" class="headerlink" title="中移苏小研C&#x2F;C++一面"></a>中移苏小研C&#x2F;C++一面</h1><p>盲面，提前打电话通知你的序号，全程不能提名字，两个面试官</p>
+<ol>
+<li><p>自我介绍</p>
+</li>
+<li><p>介绍一下c++的项目</p>
+</li>
+<li><p>线程池的具体实现</p>
+</li>
+<li><p>select了解么</p>
+</li>
+<li><p>select监听上限为什么是1024，可以通过修改代码或者内核来修改么(不会)</p>
+</li>
+<li><p>我看你线程池用的epoll，介绍一下</p>
+</li>
+<li><p>ET与LT的区别</p>
+</li>
+<li><p>vector和list的区别</p>
+</li>
+<li><p>介绍一下多态</p>
+</li>
+<li><p>TCP与UDP的区别与应用场景</p>
+</li>
+<li><p>三次握手</p>
+</li>
+<li><p>如果第一次握手没有被服务端接收到会发生什么(答错了感觉)</p>
+</li>
+<li><p>为什么需要第三次握手</p>
+</li>
+<li><p>四次挥手</p>
+</li>
+<li><p>为什么需要第四次挥手</p>
+</li>
+<li><p>惊群效应怎么产生的</p>
+</li>
+</ol>
+<p>反问了几个问题<br>最后问了下我相同条件下成都和苏州你会选择哪个地方😂(当时条了意向城市为成都和苏州，自己给自己挖坑)</p>
+<p>感觉问的很基础，面试官人也挺好的，不会的也会给你简单解答一下，一周左右有通知</p>
+]]></content>
+      <categories>
+        <category>面经</category>
+      </categories>
+  </entry>
 </search>
